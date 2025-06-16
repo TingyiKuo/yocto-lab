@@ -19,9 +19,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
       - name: Build Docker image
         run: |
-          cd docker && docker image build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t yocto-builder . && cd ..
+          docker buildx create --use --driver docker-container --driver-opt "network=host" --buildkitd-flags "--debug"
+          docker buildx build --cache-from=type=local,src=/tmp/.buildx-cache \
+                              --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+                              --build-arg userid=$(id -u) \
+                              --build-arg groupid=$(id -g) \
+                              --build-arg username=$(id -un) \
+                              -t yocto-builder \
+                              -f docker/Dockerfile .
 
       - name: Run Yocto build inside Docker container
         run: |
@@ -30,8 +45,11 @@ jobs:
             -w /app \
             yocto-builder \
             bash -c "
+              echo "In docker bash." && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
-              bitbake -f core-image-minimal
+              echo "After source setup-environment" && \
+              bitbake -f core-image-minimal && \
+              echo "After bitbake"
             "
 
       #- name: (Optional) Upload build artifacts
