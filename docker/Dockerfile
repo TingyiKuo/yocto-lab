@@ -109,6 +109,9 @@ RUN  bash /build-install-dumb-init.sh && \
 RUN locale-gen en_US.UTF-8
 RUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
+# Do not use Bitbake as root
+USER $username
+
 
 
 
