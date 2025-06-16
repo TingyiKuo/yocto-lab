@@ -30,7 +30,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx create --use --driver docker-container --driver-opt "network=host" --buildkitd-flags "--debug"
-          docker buildx build --cache-from=type=local,src=/tmp/.buildx-cache \
+          docker buildx build --load --cache-from=type=local,src=/tmp/.buildx-cache \
                               --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
                               --build-arg userid=$(id -u) \
                               --build-arg groupid=$(id -g) \
