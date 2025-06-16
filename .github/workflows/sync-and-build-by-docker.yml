@@ -80,6 +80,8 @@ jobs:
               echo 'In docker bash.' && pwd && ls -l && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
               echo 'After source setup-environment' && \
+              bitbake-layers add-layer ../meta-myiq9qemu && \
+              echo 'Added meta-myiq9qemu layer' && \
               bitbake -f core-image-minimal && \
               echo 'After bitbake' \
             "
