@@ -86,9 +86,9 @@ jobs:
               echo 'After bitbake' \
             "
 
-      #- name: (Optional) Upload build artifacts
-      #  if: always()
-      #  uses: actions/upload-artifact@v3
-      #  with:
-      #    name: yocto-build-artifacts
-      #    path: build/tmp/deploy/images/*
+      - name: (Optional) Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: yocto-build-artifacts
+          path: ${GITHUB_WORKSPACE}/build-qcom-wayland/tmp-glibc/deploy/images
