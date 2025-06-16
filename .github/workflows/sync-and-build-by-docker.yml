@@ -19,6 +19,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Checkout Custom Layer
+        uses: actions/checkout@v4
+
+      - name: Install repo
+        run: |
+          mkdir -p ~/.bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
+          chmod a+x ~/.bin/repo
+          export PATH=${PATH}:~/.bin
+          echo "PATH=$PATH" >> $GITHUB_ENV
+
+      # Restore repo cache before syncing
+      - name: Restore repo cache
+        uses: actions/cache@v3
+        with:
+          path: .repo
+          key: repo-${{ github.sha }}
+          restore-keys: |
+            repo-
+
+      - name: Repo init and sync
+        run: |
+          repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+          repo sync -j$(nproc)
+
+      # Save repo cache after syncing
+      - name: Save repo cache
+        uses: actions/cache@v3
+        with:
+          path: .repo
+          key: repo-${{ github.sha }}
+
       - name: Set up Docker cache
         uses: actions/cache@v3
         with:
