@@ -14,8 +14,16 @@ jobs:
       - name: Checkout Custom Layer
         uses: actions/checkout@v3
         with:
-          repository: TingyiKuo/myiq9qemu
+          repository: <your-org>/<your-custom-layer-repo>
           path: custom-layer
+
+      - name: Install repo
+        run: |
+          mkdir -p ~/.bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
+          chmod a+x ~/.bin/repo
+          export PATH=${PATH}:~/.bin
+          echo "PATH=$PATH" >> $GITHUB_ENV
 
       - name: Restore repo cache
         uses: actions/cache@v3
