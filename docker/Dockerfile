@@ -57,8 +57,7 @@ RUN apt-get install -y libssl-dev libssl-ocaml-dev
 ###############################################################################
 # https://github.com/crops/yocto-dockerfiles/blob/master/dockerfiles/ubuntu/ubuntu-22.04/ubuntu-22.04-base/Dockerfile
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gawk \
         wget \
         git-core \
