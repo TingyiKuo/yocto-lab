@@ -36,7 +36,7 @@ jobs:
                               --build-arg groupid=$(id -g) \
                               --build-arg username=$(id -un) \
                               -t yocto-builder \
-                              -f docker/Dockerfile .
+                              -f docker/Dockerfile docker/
 
       - name: Run Yocto build inside Docker container
         run: |
