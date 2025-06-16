@@ -34,9 +34,9 @@ jobs:
               bitbake -f core-image-minimal
             "
 
-      - name: (Optional) Upload build artifacts
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: yocto-build-artifacts
-          path: build/tmp/deploy/images/*
+      #- name: (Optional) Upload build artifacts
+      #  if: always()
+      #  uses: actions/upload-artifact@v3
+      #  with:
+      #    name: yocto-build-artifacts
+      #    path: build/tmp/deploy/images/*
