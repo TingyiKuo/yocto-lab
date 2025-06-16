@@ -1,0 +1,58 @@
+name: Yocto Build with Custom Layer
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Custom Layer
+        uses: actions/checkout@v3
+        with:
+          repository: TingyiKuo/myiq9qemu
+          path: custom-layer
+
+      - name: Restore repo cache
+        uses: actions/cache@v3
+        with:
+          path: .repo
+          key: repo-${{ github.sha }}
+          restore-keys: |
+            repo-
+
+      - name: Repo init and sync
+        run: |
+          repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+          repo sync -j$(nproc)
+
+      - name: Set up Yocto environment
+        run: |
+          MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment
+
+      - name: Add Custom Layer
+        run: |
+          bitbake-layers add-layer custom-layer
+
+      - name: Restore download cache
+        uses: actions/cache@v3
+        with:
+          path: download
+          key: download-${{ github.sha }}
+          restore-keys: |
+            download-
+
+      - name: Restore sstate-cache
+        uses: actions/cache@v3
+        with:
+          path: sstate-cache
+          key: sstate-cache-${{ github.sha }}
+          restore-keys: |
+            sstate-cache-
+
+      - name: Build the image
+        run: bitbake -f core-image-minimal

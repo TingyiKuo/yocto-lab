@@ -24,8 +24,8 @@ jobs:
       - name: Checkout Custom Layer
         uses: actions/checkout@v4
         with:        
-          repository: TingyiKuo/myiq9qemu        
-          path: custom-layer
+          repository: TingyiKuo/myiq9qemu
+          path: meta-myiq9qemu
           
       - name: Repo init and sync
         run: |
@@ -38,7 +38,7 @@ jobs:
 
       - name: Add Custom Layer
         run: |
-          bitbake-layers add-layer custom-layer
+          bitbake-layers add-layer meta-myiq9qemu
 
       - name: Build the image
         run: bitbake -f core-image-minimal
