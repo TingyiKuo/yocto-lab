@@ -46,9 +46,9 @@ jobs:
             yocto-builder \
             bash -c "
               echo "In docker bash." && pwd && ls -l && \
-              MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
+              echo MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
               echo "After source setup-environment" && \
-              bitbake -f core-image-minimal && \
+              echo bitbake -f core-image-minimal && \
               echo "After bitbake" && sleep 10
             "
 
