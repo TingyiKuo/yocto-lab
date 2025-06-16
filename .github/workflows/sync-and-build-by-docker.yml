@@ -1,0 +1,37 @@
+name: Yocto Build with Docker
+
+on:
+  #push:
+  #  branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          cd docker && docker image build --build-arg userid=$(id -u) --build-arg groupid=$(id -g) --build-arg username=$(id -un) -t yocto-builder . && cd ..
+
+      - name: Run Yocto build inside Docker container
+        run: |
+          docker run --rm \
+            -v "${GITHUB_WORKSPACE}:/app" \
+            -w /app \
+            yocto-builder \
+            bash -c "
+              MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
+              bitbake -f core-image-minimal
+            "
+
+      - name: (Optional) Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: yocto-build-artifacts
+          path: build/tmp/deploy/images/*
