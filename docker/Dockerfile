@@ -115,13 +115,9 @@ RUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 
 ###############################################################################
 
-
-
 # modify bashrc
-RUN echo "export LC_ALL=en_US.UTF-8" >> /home/$username/.bashrc
-RUN echo "export LANG=en_US.UTF-8" >> /home/$username/.bashrc
-RUN echo "toilet -w 200 -f mono9 Hi~ Yocto"  >> /home/$username/.bashrc
-RUN echo "cd ~/ssd1/pegasus"  >> /home/$username/.bashrc
+#RUN echo "export LC_ALL=en_US.UTF-8" >> /home/$username/.bashrc
+#RUN echo "export LANG=en_US.UTF-8" >> /home/$username/.bashrc
 
 
 
