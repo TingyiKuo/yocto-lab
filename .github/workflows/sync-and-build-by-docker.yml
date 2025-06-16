@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Yocto build inside Docker container
         run: |
-          docker run --rm \
+          docker run -it --rm \
             -v "${GITHUB_WORKSPACE}:/app" \
             -w /app \
             yocto-builder \
