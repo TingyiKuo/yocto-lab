@@ -10,7 +10,15 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+    inputs:
+      docker_image_source:
+        description: "Choose Docker image source"
+        required: true
+        default: "self-hosted"
+        type: choice
+        options:
+          - self-hosted
+          - build-new
 jobs:
   build:
     #runs-on: ubuntu-latest
@@ -50,6 +58,7 @@ jobs:
           key: repo-${{ github.sha }}
 
       - name: Set up Docker cache
+        if: ${{ inputs.docker_image_source == 'build-new' }}
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
@@ -58,6 +67,7 @@ jobs:
             ${{ runner.os }}-docker-
 
       - name: Build Docker image
+        if: ${{ inputs.docker_image_source == 'build-new' }}
         run: |
           docker buildx create --use --driver docker-container --driver-opt "network=host" --buildkitd-flags "--debug"
           docker buildx build --load --cache-from=type=local,src=/tmp/.buildx-cache \
@@ -67,6 +77,14 @@ jobs:
                               --build-arg username=$(id -un) \
                               -t yocto-builder \
                               -f docker/Dockerfile docker/
+
+      # Save Docker cache
+      - name: Save Docker cache
+        if: ${{ inputs.docker_image_source == 'build-new' }}
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
 
       # Restore Yocto sstate-cache
       - name: Restore sstate-cache
@@ -87,7 +105,7 @@ jobs:
             bash -c " \
               echo 'In docker bash.' && pwd && ls -l && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
-              bitbake -f core-image-minimal && \
+              bitbake -f core-image-minimal \
             "
 
       # Save Yocto sstate-cache
