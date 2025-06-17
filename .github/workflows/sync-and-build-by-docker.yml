@@ -36,6 +36,16 @@ jobs:
       - name: Checkout Custom Layer
         uses: actions/checkout@v4
 
+      - name: Show selected variables
+        run: |
+          echo DOCKER_CACHE_VAR: $DOCKER_CACHE_VAR"
+          echo STATE_CACHE_VAR: $STATE_CACHE_VAR"
+          echo GITHUB_WORKSPACE: $GITHUB_WORKSPACE
+        env:
+          DOCKER_CACHE_VAR: ${{ inputs.docker_image_source }}
+          STATE_CACHE_VAR: ${{ inputs.use_cache }}
+
+
       - name: Install repo
         run: |
           mkdir -p ~/.bin
