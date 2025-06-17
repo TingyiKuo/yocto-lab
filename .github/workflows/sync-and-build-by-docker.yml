@@ -44,16 +44,19 @@ jobs:
           export PATH=${PATH}:~/.bin
           echo "PATH=$PATH" >> $GITHUB_ENV
 
+      - name: Repo init
+        run: |
+            repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+
       # Restore repo cache before syncing
       - name: Restore repo cache
         uses: actions/cache@v3
         with:
           path: .repo
-          key: repo-cache-${{ github.sha }}
+          key: repo-cache-${{ hashFiles('.repo/manifest.xml') }}
 
-      - name: Repo init and sync
+      - name: Repo sync sync
         run: |
-          repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
           repo sync -j$(nproc)
 
       # Save repo cache after syncing
@@ -61,14 +64,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .repo
-          key: repo-cache-${{ github.sha }}
+          key: repo-cache-${{ hashFiles('.repo/manifest.xml') }}
 
       - name: Set up Docker cache
         if: ${{ inputs.docker_image_source == 'build-new' }}
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: docker-cache-${{ github.sha }}
+          key: docker-cache-${{ hashFiles('docker/Dockerfile', 'docker/**/*') }}
 
       - name: Build Docker image
         if: ${{ inputs.docker_image_source == 'build-new' }}
@@ -88,7 +91,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: docker-cache-${{ github.sha }}
+          key: docker-cache-${{ hashFiles('docker/Dockerfile', 'docker/**/*') }}
 
       # Restore Yocto sstate-cache
       - name: Restore sstate-cache
