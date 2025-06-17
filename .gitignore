@@ -2,9 +2,12 @@
 .vscode
 setup-environment
 layers
+downloads
+sstate-cache
 build-qcom-wayland/bitbake-cookerdaemon.log
 build-qcom-wayland/bitbake.lock
 build-qcom-wayland/bitbake.sock
 build-qcom-wayland/cache
 build-qcom-wayland/tmp-glibc
 build-qcom-wayland/tmp-qcom-guestvm-glibc
+build-qcom-wayland/buildhistory/

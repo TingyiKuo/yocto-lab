@@ -77,30 +77,17 @@ jobs:
           restore-keys: |
             sstate-cache-
 
-      # Restore Yocto downloads
-      - name: Restore downloads
-        uses: actions/cache@v3
-        with:
-          path: downloads
-          key: downloads-${{ github.sha }}
-          restore-keys: |
-            downloads-
-
-
       - name: Run Yocto build inside Docker container
         run: |
           docker run --rm \
+            -v "/home/yocto-mirror/downloads:/app/downloads" \
             -v "${GITHUB_WORKSPACE}:/app" \
             -w /app \
             yocto-builder \
             bash -c " \
               echo 'In docker bash.' && pwd && ls -l && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
-              echo 'After source setup-environment' && \
-              bitbake-layers add-layer ../meta-myiq9qemu && \
-              echo 'Added meta-myiq9qemu layer' && \
               bitbake -f core-image-minimal && \
-              echo 'After bitbake' \
             "
 
       # Save Yocto sstate-cache
@@ -109,13 +96,6 @@ jobs:
         with:
           path: sstate-cache
           key: sstate-cache-${{ github.sha }}
-
-      # Save Yocto downloads
-      - name: Save downloads
-        uses: actions/cache@v3
-        with:
-          path: downloads
-          key: downloads-${{ github.sha }}
 
       - name: Upload build artifacts
         if: always()

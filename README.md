@@ -38,6 +38,10 @@ docker run --rm \
     bash -c " \
         MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
         bitbake-layers add-layer ../asus-layers/meta-myiq9qemu && \
-        echo bitbake -f core-image-minimal \
+        bitbake -f core-image-minimal \
     "
 ```
+
+## Self hosted runner 
+
+Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
