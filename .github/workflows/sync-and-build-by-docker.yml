@@ -120,7 +120,7 @@ jobs:
           path: downloads
           key: downloads-${{ github.sha }}
 
-      - name: (Optional) Upload build artifacts
+      - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:

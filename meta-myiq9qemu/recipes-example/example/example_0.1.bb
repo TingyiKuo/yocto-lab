@@ -2,6 +2,19 @@ SUMMARY = "bitbake-layers recipe"
 DESCRIPTION = "Recipe created by bitbake-layers"
 LICENSE = "MIT"
 
+SRC_URI += "file://hello.cpp"
+
+S = "${WORKDIR}"
+
+do_compile() {
+    ${CXX} hello.cpp -o hello-world
+}
+
+do_install() {
+    install -d ${D}${bindir}
+    install -m 0755 hello-world ${D}${bindir}/hello-world
+}
+
 python do_display_banner() {
     bb.plain("***********************************************");
     bb.plain("*                                             *");
