@@ -71,6 +71,25 @@ jobs:
                               -t yocto-builder \
                               -f docker/Dockerfile docker/
 
+      # Restore Yocto sstate-cache
+      - name: Restore sstate-cache
+        uses: actions/cache@v3
+        with:
+          path: sstate-cache
+          key: sstate-cache-${{ github.sha }}
+          restore-keys: |
+            sstate-cache-
+
+      # Restore Yocto downloads
+      - name: Restore downloads
+        uses: actions/cache@v3
+        with:
+          path: downloads
+          key: downloads-${{ github.sha }}
+          restore-keys: |
+            downloads-
+
+
       - name: Run Yocto build inside Docker container
         run: |
           docker run --rm \
@@ -86,6 +105,20 @@ jobs:
               bitbake -f core-image-minimal && \
               echo 'After bitbake' \
             "
+
+      # Save Yocto sstate-cache
+      - name: Save sstate-cache
+        uses: actions/cache@v3
+        with:
+          path: sstate-cache
+          key: sstate-cache-${{ github.sha }}
+
+      # Save Yocto downloads
+      - name: Save downloads
+        uses: actions/cache@v3
+        with:
+          path: downloads
+          key: downloads-${{ github.sha }}
 
       - name: (Optional) Upload build artifacts
         if: always()
