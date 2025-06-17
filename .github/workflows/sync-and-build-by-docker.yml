@@ -19,6 +19,14 @@ on:
         options:
           - self-hosted
           - build-new
+      use_cache:
+        description: "Use caching for sstate-cache"
+        required: true
+        default: "yes"
+        type: choice
+        options:
+          - yes
+          - no
 jobs:
   build:
     #runs-on: ubuntu-latest
@@ -41,9 +49,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .repo
-          key: repo-${{ github.sha }}
-          restore-keys: |
-            repo-
+          key: repo-cache-${{ github.sha }}
 
       - name: Repo init and sync
         run: |
@@ -55,16 +61,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .repo
-          key: repo-${{ github.sha }}
+          key: repo-cache-${{ github.sha }}
 
       - name: Set up Docker cache
         if: ${{ inputs.docker_image_source == 'build-new' }}
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-docker-
+          key: docker-cache-${{ github.sha }}
 
       - name: Build Docker image
         if: ${{ inputs.docker_image_source == 'build-new' }}
@@ -84,16 +88,15 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ github.sha }}
+          key: docker-cache-${{ github.sha }}
 
       # Restore Yocto sstate-cache
       - name: Restore sstate-cache
+        if: ${{ inputs.use_cache == 'yes' }}
         uses: actions/cache@v3
         with:
           path: sstate-cache
           key: sstate-cache-${{ github.sha }}
-          restore-keys: |
-            sstate-cache-
 
       - name: Run Yocto build inside Docker container
         run: |
@@ -110,6 +113,7 @@ jobs:
 
       # Save Yocto sstate-cache
       - name: Save sstate-cache
+        if: ${{ inputs.use_cache == 'yes' }}
         uses: actions/cache@v3
         with:
           path: sstate-cache
