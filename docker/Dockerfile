@@ -47,7 +47,12 @@ RUN apt-get update
 #   https://docs.qualcomm.com/bundle/publicresource/topics/80-70018-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.4
 
 
-RUN apt-get install -y repo gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool locales tar python-is-python3 file libxml-opml-simplegen-perl vim whiptail g++ libacl1
+RUN apt-get install -y repo gawk wget git diffstat unzip texinfo gcc build-essential 
+RUN apt-get install -y chrpath socat cpio python3 python3-pip python3-pexpect xz-utils 
+RUN apt-get install -y debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa
+RUN apt-get install -y libsdl1.2-dev pylint xterm python3-subunit mesa-common-dev zstd 
+RUN apt-get install -y liblz4-tool locales tar python-is-python3 file libxml-opml-simplegen-perl 
+RUN apt-get install -y vim whiptail g++ libacl1
 
 RUN apt-get install -y gcc-multilib 
 RUN apt-get install -y libssl-dev libssl-ocaml-dev
