@@ -17,9 +17,6 @@ jobs:
     runs-on: [self-hosted, linux, x64]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Checkout Custom Layer
         uses: actions/checkout@v4
 
