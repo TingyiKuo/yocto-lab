@@ -1,0 +1,87 @@
+From 17e9d0568d7add46de8062f6c38ea2b2d9bbbd45 Mon Sep 17 00:00:00 2001
+From: Amit Singh <quic_amitsi@quicinc.com>
+Date: Tue, 4 Mar 2025 19:26:58 +0530
+Subject: [PATCH] PENDING: arm64: dts: qcom: qcs9075-rb8: Enable Display Port
+
+Enable DPTX0 and DPTX1 along with their corresponding PHYs for
+qcs9075-rb8 platform.
+
+---
+ arch/arm64/boot/dts/qcom/qcs9075-rb8.dts | 54 ++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts b/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
+index 90f6ceb6ad65..fffb21e7148e 100644
+--- a/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
++++ b/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
+@@ -604,6 +604,48 @@ &spi19 {
+ 	qcom,xfer-mode = <1>;
+ };
+ 
++&mdss0 {
++	status = "okay";
++};
++
++&mdss0_dp0 {
++	status = "okay";
++
++	pinctrl-0 = <&dp0_hot_plug_det>;
++	pinctrl-names = "default";
++};
++
++&mdss0_dp0_out {
++	data-lanes = <0 1 2 3>;
++	link-frequencies = /bits/ 64 <1620000000 2700000000 5400000000 8100000000>;
++};
++
++&mdss0_dp0_phy {
++	status = "okay";
++
++	vdda-phy-supply = <&vreg_l1c>;
++	vdda-pll-supply = <&vreg_l4a>;
++};
++
++&mdss0_dp1 {
++	status = "okay";
++
++	pinctrl-0 = <&dp1_hot_plug_det>;
++	pinctrl-names = "default";
++};
++
++&mdss0_dp1_out {
++	data-lanes = <0 1 2 3>;
++	link-frequencies = /bits/ 64 <1620000000 2700000000 5400000000 8100000000>;
++};
++
++&mdss0_dp1_phy {
++	status = "okay";
++
++	vdda-phy-supply = <&vreg_l1c>;
++	vdda-pll-supply = <&vreg_l4a>;
++};
++
+ &tlmm {
+ 	bt_bootstrap_default: bt_bootstrap_default {
+ 		pins = "gpio147";
+@@ -613,6 +655,18 @@ bt_bootstrap_default: bt_bootstrap_default {
+ 		drive-strength = <2>;
+ 	};
+ 
++	dp0_hot_plug_det: dp0-hot-plug-det-state {
++		pins = "gpio101";
++		function = "edp0_hot";
++		bias-disable;
++	};
++
++	dp1_hot_plug_det: dp1-hot-plug-det-state {
++		pins = "gpio102";
++		function = "edp1_hot";
++		bias-disable;
++	};
++
+ 	qup_uart10_default: qup-uart10-state {
+ 		pins = "gpio46", "gpio47";
+ 		function = "qup1_se3";
+-- 
+2.34.1
+

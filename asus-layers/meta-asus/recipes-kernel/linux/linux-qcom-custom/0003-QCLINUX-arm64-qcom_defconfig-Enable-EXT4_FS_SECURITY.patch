@@ -1,0 +1,27 @@
+From 3b3dafd5b4fe6bf8c297d2feb82455ec23ad360e Mon Sep 17 00:00:00 2001
+From: Shivendra Pratap <quic_spratap@quicinc.com>
+Date: Thu, 17 Apr 2025 18:43:05 +0530
+Subject: [PATCH] QCLINUX: arm64: qcom_defconfig: Enable EXT4_FS_SECURITY
+
+Enable CONFIG_EXT4_FS_SECURITY.
+This option enables an extended attribute handler for
+file security labels in the ext4 filesystem.
+
+Change-Id: I7cdb8aec11b0f3172e77c4f50e57571524c01d1e
+Signed-off-by: Shivendra Pratap <quic_spratap@quicinc.com>
+---
+ arch/arm64/configs/qcom_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/configs/qcom_defconfig b/arch/arm64/configs/qcom_defconfig
+index 4b4219051522..99f470456468 100644
+--- a/arch/arm64/configs/qcom_defconfig
++++ b/arch/arm64/configs/qcom_defconfig
+@@ -783,6 +783,7 @@ CONFIG_HTE=y
+ # CONFIG_EXT2_FS is not set
+ CONFIG_EXT3_FS=y
+ CONFIG_EXT4_FS_POSIX_ACL=y
++CONFIG_EXT4_FS_SECURITY=y
+ CONFIG_EXT4_USE_FOR_EXT2=y
+ CONFIG_FS_ENCRYPTION=y
+ CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y

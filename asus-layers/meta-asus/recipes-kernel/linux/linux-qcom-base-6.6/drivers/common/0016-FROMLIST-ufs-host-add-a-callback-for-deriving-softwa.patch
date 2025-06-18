@@ -1,0 +1,69 @@
+From 1652f735bdbeb71fc4707940e27800afa751eeca Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Sun, 1 Dec 2024 22:00:53 +0530
+Subject: [PATCH 16/17] FROMLIST: ufs: host: add a callback for deriving
+ software secrets and use it
+
+Add a new UFS core callback for deriving software secrets from hardware
+wrapped keys and implement it in QCom UFS.
+
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
+Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Upstream-Status: Submitted [https://lore.kernel.org/all/20241011-wrapped-keys-v7-16-e3f7a752059b@linaro.org/]
+---
+ drivers/ufs/host/ufs-qcom.c | 15 +++++++++++++++
+ include/ufs/ufshcd.h        |  1 +
+ 2 files changed, 16 insertions(+)
+
+diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
+index 2befc0e99a88..00568c4b100b 100644
+--- a/drivers/ufs/host/ufs-qcom.c
++++ b/drivers/ufs/host/ufs-qcom.c
+@@ -185,9 +185,23 @@ static int ufs_qcom_ice_program_key(struct ufs_hba *hba,
+ 		return qcom_ice_evict_key(host->ice, slot);
+ }
+
++/*
++ * Derive a software secret from a hardware wrapped key. The key is unwrapped in
++ * hardware from trustzone and a software key/secret is then derived from it.
++ */
++static int ufs_qcom_ice_derive_sw_secret(struct ufs_hba *hba, const u8 wkey[],
++					 unsigned int wkey_size,
++					 u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
++{
++	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
++
++	return qcom_ice_derive_sw_secret(host->ice, wkey, wkey_size, sw_secret);
++}
++
+ #else
+
+ #define ufs_qcom_ice_program_key NULL
++#define ufs_qcom_ice_derive_sw_secret NULL
+
+ static inline void ufs_qcom_ice_enable(struct ufs_qcom_host *host)
+ {
+@@ -1895,6 +1909,7 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
+ 	.device_reset		= ufs_qcom_device_reset,
+ 	.config_scaling_param = ufs_qcom_config_scaling_param,
+ 	.program_key		= ufs_qcom_ice_program_key,
++	.derive_sw_secret	= ufs_qcom_ice_derive_sw_secret,
+ 	.reinit_notify		= ufs_qcom_reinit_notify,
+ 	.mcq_config_resource	= ufs_qcom_mcq_config_resource,
+ 	.get_hba_mac		= ufs_qcom_get_hba_mac,
+diff --git a/include/ufs/ufshcd.h b/include/ufs/ufshcd.h
+index ceccee81fc2c..b72ea68a9634 100644
+--- a/include/ufs/ufshcd.h
++++ b/include/ufs/ufshcd.h
+@@ -319,6 +319,7 @@ struct ufs_pwr_mode_info {
+  * @device_reset: called to issue a reset pulse on the UFS device
+  * @config_scaling_param: called to configure clock scaling parameters
+  * @program_key: program or evict an inline encryption key
++ * @derive_sw_secret: derive sw secret from a wrapped key
+  * @event_notify: called to notify important events
+  * @reinit_notify: called to notify reinit of UFSHCD during max gear switch
+  * @mcq_config_resource: called to configure MCQ platform resources
+--
+2.34.1
+
