@@ -32,14 +32,23 @@ Step3: build image
 
 ```baseh
 docker run --rm \
+    -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
     -v ${GITHUB_WORKSPACE}:/app \
     -w /app \
     yocto-builder \
     bash -c " \
-        MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment && \
-        bitbake-layers add-layer ../asus-layers/meta-myiq9qemu && \
+        MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland && \
         bitbake -f core-image-minimal \
     "
+# or
+
+docker run -it --rm \
+    -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
+    -v ${GITHUB_WORKSPACE}:/app \
+    -w /app \
+    yocto-builder \
+    bash
+
 ```
 
 ## Self hosted runner 
