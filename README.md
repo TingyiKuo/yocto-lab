@@ -38,7 +38,7 @@ docker run --rm \
     yocto-builder \
     bash -c " \
         MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland && \
-        bitbake -f core-image-minimal \
+        bitbake core-image-minimal \
     "
 # or
 

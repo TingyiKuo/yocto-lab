@@ -22,7 +22,7 @@ on:
       use_cache:
         description: "Use caching for sstate-cache"
         required: true
-        default: "yes"
+        default: "no"
         type: choice
         options:
           - yes
@@ -121,7 +121,7 @@ jobs:
             bash -c " \
               echo 'In docker bash.' && pwd && ls -l && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland && \
-              bitbake -f core-image-minimal \
+              bitbake core-image-minimal \
             "
 
       # Save Yocto sstate-cache
