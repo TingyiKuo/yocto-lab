@@ -67,6 +67,7 @@ kernel_conf_variable() {
     else
         echo "CONFIG_$1=$2" >> ${B}/.config
     fi
+    echo "CONFIG_ASUSCUSTOM_KERNEL=1.0" >> ${B}/.config
 }
 
 do_configure:prepend() {
