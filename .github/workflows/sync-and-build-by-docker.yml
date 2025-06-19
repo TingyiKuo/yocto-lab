@@ -5,8 +5,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   #push:
   #  branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -105,7 +105,7 @@ jobs:
 
       # Restore Yocto sstate-cache
       - name: Restore sstate-cache
-        #if: ${{ inputs.use_cache == 'yes' }}
+        if: ${{ inputs.use_cache == 'yes' }}
         uses: actions/cache@v3
         with:
           path: sstate-cache
@@ -126,7 +126,7 @@ jobs:
 
       # Save Yocto sstate-cache
       - name: Save sstate-cache
-        #if: ${{ inputs.use_cache == 'yes' }}
+        if: ${{ inputs.use_cache == 'yes' }}
         uses: actions/cache@v3
         with:
           path: sstate-cache
