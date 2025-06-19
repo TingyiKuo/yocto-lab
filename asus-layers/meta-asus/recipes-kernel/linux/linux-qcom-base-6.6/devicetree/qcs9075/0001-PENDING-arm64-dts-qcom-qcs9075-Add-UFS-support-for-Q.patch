@@ -1,0 +1,55 @@
+From 14f510a12e53cd23511eb36d6f4d766b4f891726 Mon Sep 17 00:00:00 2001
+From: Sayali Lokhande <quic_sayalil@quicinc.com>
+Date: Tue, 26 Nov 2024 14:20:10 +0530
+Subject: [PATCH] PENDING: arm64: dts: qcom: qcs9075: Add UFS support for
+ QCS9075 RB8
+
+Add UFS support for qcs9075 rb8 board.
+
+Change-Id: I1545082ef73a83d321cf4a669697dcf080000d03
+Signed-off-by: Sayali Lokhande <quic_sayalil@quicinc.com>
+(cherry picked from commit 235c36f69ecb8c22a47a94b756ff2083b3c2772e)
+---
+ arch/arm64/boot/dts/qcom/qcs9075-rb8.dts | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts b/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
+index a661348d3953..b8151cd0acaa 100644
+--- a/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
++++ b/arch/arm64/boot/dts/qcom/qcs9075-rb8.dts
+@@ -19,6 +19,7 @@
+ 
+ 	aliases {
+ 		serial0 = &uart10;
++		ufshc1 = &ufs_mem_hc;
+ 	};
+ 
+ 	chosen {
+@@ -630,6 +631,23 @@
+ 	status = "okay";
+ };
+ 
++&ufs_mem_hc {
++	reset-gpios = <&tlmm 149 GPIO_ACTIVE_LOW>;
++	vcc-supply = <&vreg_l8a>;
++	vcc-max-microamp = <1100000>;
++	vccq-supply = <&vreg_l4c>;
++	vccq-max-microamp = <1200000>;
++
++	status = "okay";
++};
++
++&ufs_mem_phy {
++	vdda-phy-supply = <&vreg_l4a>;
++	vdda-pll-supply = <&vreg_l1c>;
++
++	status = "okay";
++};
++
+ &usb_0 {
+ 	status = "okay";
+ };
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
