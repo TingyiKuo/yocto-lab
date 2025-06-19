@@ -49,8 +49,28 @@ docker run -it --rm \
     yocto-builder \
     bash
 
+# in docker
+MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland
+bitbake core-image-minimal
+
 ```
 
 ## Self hosted runner 
 
 Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
+
+
+## To sync code from to my kernel git.
+
+```bash
+cd src/linux-6.6.y
+git remote add git-kernel-org git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+git fetch git-kernel-org linux-6.6.y
+git checkout -b my-linux-6.6.y git-kernel-org/linux-6.6.y
+
+git reset --hard 943e0aeece93a9c2329215d02621e634adf6d790 # This is from the code base..
+
+git push origin my-linux-6.6.y
+```
+
+

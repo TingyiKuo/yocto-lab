@@ -12,7 +12,7 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'sota', 'sota', '', d)}
 
 COMPATIBLE_MACHINE = "(qcom)"
 
-SRC_URI = " git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git;protocol=https;branch=linux-6.6.y \
+SRC_URI = " git://github.com/TingyiKuo/git-kernel-org.git;branch=my-linux-6.6.y \
             file://qcom.cfg \
             file://vm-configs/qcom_vm.cfg \
             file://qcom_debug.cfg \
@@ -25,13 +25,14 @@ require ${BPN}-${PV}/dt-bindings.inc
 require ${BPN}-${PV}/tools.inc
 require ${BPN}-${PV}/documentation.inc
 
+# ./tmp-glibc/work/qcs9100_ride_sx-qcom-linux/linux-qcom-base/6.6+git/qcom.cfg
 KERNEL_CONFIG_FRAGMENTS:append = " ${WORKDIR}/qcom.cfg"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${WORKDIR}/qcom_debug.cfg', '', d)}"
 
 S = "${WORKDIR}/git"
 
 # 6.6.65
-SRCREV = "943e0aeece93a9c2329215d02621e634adf6d790"
+SRCREV = "d1de051464a3301909979e4eb6e32e69ae68ed05"
 PV = "6.6+git${SRCPV}"
 
 KERNEL_CONFIG ??= "defconfig"
@@ -46,6 +47,10 @@ KERNEL_MODULE_AUTOLOAD += "coresight-remote-etm coresight-tgu"
 KERNEL_MODULE_AUTOLOAD += "stm_core stm_p_ost stm_p_basic stm_console stm_heartbeat stm_ftrace"
 
 kernel_conf_variable() {
+
+    echo "Tingyi:kernel_conf_variable ++"
+
+
     sed -e "/CONFIG_$1[ =]/d;" -i ${B}/.config
     if test "$2" = "n"
     then
@@ -57,6 +62,9 @@ kernel_conf_variable() {
 }
 
 do_configure:prepend() {
+
+    echo "Tingyi:do_configure:prepend ++"
+
     if [ ! -f "${S}/arch/${ARCH}/configs/${KERNEL_CONFIG}" ]; then
         bbfatal "KERNEL_CONFIG '${KERNEL_CONFIG}' was specified, but not present in the source tree"
     else
@@ -73,6 +81,8 @@ do_configure:prepend() {
         echo "# Global settings from linux recipe" >> ${B}/.config
         echo "CONFIG_LOCALVERSION="\"${LINUX_VERSION_EXTENSION}\" >> ${B}/.config
     fi
+
+    echo "CONFIG_ASUS_KERNEL=2.0" >> ${B}/.config
 
     # Check for kernel config fragments.  The assumption is that the config
     # fragment will be specified with the absolute path.  For example:
@@ -105,6 +115,9 @@ do_configure:prepend() {
 }
 
 do_configure:append() {
+
+    echo "Tingyi:do_configure:append ++"
+
     oe_runmake -C ${S} O=${B} savedefconfig && cp ${B}/defconfig ${WORKDIR}/defconfig.saved
 }
 
