@@ -107,3 +107,7 @@ do_configure:prepend() {
 do_configure:append() {
     oe_runmake -C ${S} O=${B} savedefconfig && cp ${B}/defconfig ${WORKDIR}/defconfig.saved
 }
+
+hello_linux_qcom_base() {
+    echo "hello_linux_qcom_base ++"
+}

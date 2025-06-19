@@ -153,3 +153,8 @@ do_unpack[postfuncs] += "copy_msm"
 
 KERNEL_MODULE_PROBECONF += "msm"
 module_conf_msm = "blacklist msm"
+
+
+hello_linux_qcom_custom() {
+    echo "hello_linux_qcom_custom ++"
+}
