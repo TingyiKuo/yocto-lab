@@ -14,7 +14,8 @@ export GITHUB_WORKSPACE=${PWD}
 Step1: sync QCT's repo
 
 ```bash
-repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+#repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1_robotics-product-sdk-1.1.xml
 repo sync -j$(nproc)
 ```
 
@@ -53,6 +54,19 @@ docker run -it --rm \
 MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland
 bitbake core-image-minimal
 
+MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
+bitbake qcom-robotics-full-image
+
+```
+
+Thomas's command
+
+```base
+export EXTRALAYERS="meta-qcom-extras meta-qcom-robotics-extras" && \
+export CUST_ID="213195" && \
+export FWZIP_PATH="/ssd1/workarea/IQ9100/IQ9100_firmware_extras/qualcomm-linux-spf-1-0_hlos_oem_metadata/QCS9100.LE.1.0/common/build/ufs/bin" && \
+MACHINE=qcs9100-ride-sx && export DISTRO=qcom-robotics-ros2-jazzy && QCOM_SELECTED_BSP=custom && source setup-robotics-environment && \
+../qirp-build qcom-robotics-full-image
 ```
 
 ## Self hosted runner 
