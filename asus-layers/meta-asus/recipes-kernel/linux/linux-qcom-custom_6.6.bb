@@ -11,8 +11,8 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'sota', 'sota', '', d)}
 
 COMPATIBLE_MACHINE = "(qcom)"
 
-SRCPROJECT = "git://git.codelinaro.org/clo/la/kernel/qcom.git;protocol=https"
-SRCBRANCH  = "kernel.qclinux.1.0.r1-rel"
+SRCPROJECT = "git://github.com/TingyiKuo/linux.git;protocol=https"
+SRCBRANCH  = "my-kernel.qclinux.1.0.r1-rel"
 SRCREV     = "e21546bdd3154f9ee83a579f2e3c80d313c1169d"
 
 SRC_URI = "${SRCPROJECT};branch=${SRCBRANCH};destsuffix=kernel \

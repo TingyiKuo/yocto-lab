@@ -62,8 +62,19 @@ Need to put the downloads folder at /home/yocoto/downloads and make sure have pe
 
 ## To sync code from to my kernel git.
 
+
+For the limitation of size pushing to github, my idea is to take advantage of already existed project on github and fork it
+
+Here I choose https://github.com/linuxkit/linux
+
+I fork it to my own repo [linuxkit/linux](https://github.com/TingyiKuo/linux.git)
+
+
+To merge Linux ORG's branch
+
+
 ```bash
-cd src/linux-6.6.y
+cd Tingyi/linux
 git remote add git-kernel-org git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
 git fetch git-kernel-org linux-6.6.y
 git checkout -b my-linux-6.6.y git-kernel-org/linux-6.6.y
@@ -73,4 +84,20 @@ git reset --hard 943e0aeece93a9c2329215d02621e634adf6d790 # This is from the cod
 git push origin my-linux-6.6.y
 ```
 
+To merge QCT's customize branch
+
+
+```bash
+
+git remote add git-codelinaro-org https://git.codelinaro.org/clo/la/kernel/qcom.git
+git fetch git-codelinaro-org kernel.qclinux.1.0.r1-rel
+git checkout -b my-kernel.qclinux.1.0.r1-rel git-codelinaro-org/kernel.qclinux.1.0.r1-rel
+
+git reset --hard e21546bdd3154f9ee83a579f2e3c80d313c1169d # This is from the code base..
+
+git push origin my-kernel.qclinux.1.0.r1-rel
+
+
+
+```
 

@@ -12,7 +12,7 @@ inherit ${@bb.utils.contains('DISTRO_FEATURES', 'sota', 'sota', '', d)}
 
 COMPATIBLE_MACHINE = "(qcom)"
 
-SRC_URI = " git://github.com/TingyiKuo/git-kernel-org.git;branch=my-linux-6.6.y \
+SRC_URI = " git://github.com/TingyiKuo/linux.git;branch=my-linux-6.6.y \
             file://qcom.cfg \
             file://vm-configs/qcom_vm.cfg \
             file://qcom_debug.cfg \
@@ -32,7 +32,7 @@ KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${WORKDIR
 S = "${WORKDIR}/git"
 
 # 6.6.65
-SRCREV = "d1de051464a3301909979e4eb6e32e69ae68ed05"
+SRCREV = "943e0aeece93a9c2329215d02621e634adf6d790"
 PV = "6.6+git${SRCPV}"
 
 KERNEL_CONFIG ??= "defconfig"
