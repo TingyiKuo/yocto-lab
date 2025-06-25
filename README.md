@@ -5,12 +5,6 @@ Build and run IQ9 image on QEMU
 
 ## To Build
 
-
-Step0: Emu github environment
-
-export GITHUB_WORKSPACE=${PWD}
-
-
 Step1: sync QCT's repo
 
 ```bash
@@ -34,7 +28,7 @@ Step3: build image
 ```baseh
 docker run --rm \
     -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
-    -v ${GITHUB_WORKSPACE}:/app \
+    -v ${PWD}:/app \
     -w /app \
     yocto-builder \
     bash -c " \
@@ -45,7 +39,7 @@ docker run --rm \
 
 docker run -it --rm \
     -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
-    -v ${GITHUB_WORKSPACE}:/app \
+    -v ${PWD}:/app \
     -w /app \
     yocto-builder \
     bash
@@ -55,7 +49,7 @@ MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-
 bitbake core-image-minimal
 
 MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
-bitbake qcom-robotics-full-image
+../qirp-build qcom-robotics-full-image
 
 ```
 

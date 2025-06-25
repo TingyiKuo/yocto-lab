@@ -4,6 +4,8 @@ setup-environment
 layers
 downloads
 sstate-cache
+
+# For IQ9 Wayland build
 build-qcom-wayland/bitbake-cookerdaemon.log
 build-qcom-wayland/bitbake.lock
 build-qcom-wayland/bitbake.sock
@@ -11,3 +13,11 @@ build-qcom-wayland/cache
 build-qcom-wayland/tmp-glibc
 build-qcom-wayland/tmp-qcom-guestvm-glibc
 build-qcom-wayland/buildhistory/
+
+# For IQ9 ROS2 build
+build-qcs9100-base/bitbake-cookerdaemon.log
+build-qcs9100-base/bitbake.lock
+build-qcs9100-base/bitbake.sock
+build-qcs9100-base/cache/
+build-qcs9100-base/tmp-glibc/
+build-qcs9100-base/tmp-qcom-guestvm-glibc/
