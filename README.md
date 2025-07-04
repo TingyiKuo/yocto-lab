@@ -1,54 +1,81 @@
 # myiq9qemu
 Build and run IQ9 image on QEMU
 
+# Build a BSP image
+
+The board support package (BSP) image build has software components for the Qualcomm device support and software features applicable to Qualcomm SoCs. This build includes a reference distribution configuration for the Qualcomm development kits. For more details, see Qualcomm Linux metadata layers.
 
 
-## To Build
+## To Build with GitHub for unregistered users (U) / Registered users (R)
+
+
+https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.5#github-workflow-unregistered-users
 
 Step1: sync QCT's repo
 
 ```bash
-#repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
-repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1_robotics-product-sdk-1.1.xml
+repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
+
 repo sync -j$(nproc)
 ```
+
+
+| SKU | manifest file | distribution |
+|----------|:---------:|---------:|
+| BSP build: High-level OS and prebuilt firmware (GPS only)  |  qcom-6.6.90-QLI.1.5-Ver.1.1.xml  |  qcom-wayland  |
+| BSP build + Qualcomm IM SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_qim-product-sdk-2.0.1.xml   |  qcom-wayland  |
+| BSP build + Real-time kernel build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_realtime-linux-1.1.xml   |    qcom-wayland  |
+| BSP build + QIR SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml   |   qcom-robotics-ros2-humble  |
+
+
+
 
 Step2: prepare yocto-builder
 
 ```bash
-docker build --build-arg userid=$(id -u) \
+docker image build --build-arg userid=$(id -u) \
              --build-arg groupid=$(id -g) \
              --build-arg username=$(id -un) \
              -t yocto-builder \
-             -f docker/Dockerfile docker
+             -f docker/Dockerfile.local docker
+
+
 ```                              
 
-Step3: build image
+Step3: login into docker containner
 
 ```baseh
-docker run --rm \
-    -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
-    -v ${PWD}:/app \
-    -w /app \
-    yocto-builder \
-    bash -c " \
-        MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland && \
-        bitbake core-image-minimal \
-    "
-# or
 
 docker run -it --rm \
-    -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
-    -v ${PWD}:/app \
-    -w /app \
+    -v "/home/yocto/cache:/home/yocto/cache" \
+    -v ${PWD}:${PWD} \
+    -w ${PWD} \
     yocto-builder \
     bash
 
-# in docker
-MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland
-bitbake core-image-minimal
+# or
 
+. docker/login-into-docker
+
+
+```
+
+
+# in docker
+
+Build by bitbake
+
+```bash
+
+# For (U)
+MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
+
+#bitbake core-image-minimal
+bitbake qcom-multimedia-image
+
+# For (R)
 MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
+MACHINE=qemuarm64 DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
 ../qirp-build qcom-robotics-full-image
 
 ```

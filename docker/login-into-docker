@@ -1,0 +1,6 @@
+docker run -it --rm \
+    -v "/home/yocto/cache:/home/yocto/cache" \
+    -v ${PWD}:${PWD} \
+    -w ${PWD} \
+    yocto-builder \
+    bash
