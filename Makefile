@@ -98,8 +98,27 @@ run-qemu:
      -netdev user,id=net0 \
      -device virtio-net-pci,netdev=net0 \
      -monitor telnet:127.0.0.1:5555,server,nowait \
+     -serial mon:stdio \
+    -device qemu-xhci,id=usb \
+    -device usb-tablet,bus=usb.0 \
+    -device virtio-keyboard-pci \
+    -device virtio-gpu-pci \
      -device virtio-gpu-pci \
-     -device virtio-mouse \
-     -device virtio-keyboard \
-     -serial mon:stdio
+     -display gtk,gl=on,grab-on-hover=on
+	
+.PHONY: kill-qemu
+kill-qemu:
+	@pid=$$(pidof qemu-system-aarch64); \
+	if [ -n "$$pid" ]; then \
+		echo "Killing QEMU process: $$pid"; \
+		kill $$pid; \
+	else \
+		echo "No QEMU AArch64 process found."; \
+	fi
 
+#     -cpu cortex-a57  why panic?
+
+#     -display gtk,gl=on \
+#     -device virtio-gpu-pci \
+#     -device virtio-mouse \
+#     -device virtio-keyboard \
