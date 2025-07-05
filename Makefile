@@ -1,0 +1,105 @@
+
+yocto-builder-TAG=amito4/yocto-builder
+user_id=$(shell id -u)
+user_name=$(shell id -un)
+user_group=$(shell id -g)
+root_path=$(shell pwd)
+
+RPIIMG=${root_path}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/qcom-multimedia-image-qcs9100-ride-sx.rootfs.ext4
+KERNEL_IMG=${root_path}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image
+AARCH64_QEMU=./tools/qemu/build/qemu-system-aarch64
+
+
+.PHONY: show_help
+show_help:
+	@echo "make : show help"
+	@echo "make run-qemu : launch qemu"
+	@echo "make builder-image : build docker image"
+	@echo "make builder-login : login into interactive container"
+	@echo "make builder-qcom-wayland : build build-qcom-wayland"
+	@echo "make builder-qemu :
+	
+	
+	
+all:show_help
+
+
+.PHONY: builder-image
+builder-image: builder-docker-image_${user_id}.stamp
+
+# build yocto-builder docker image
+builder-docker-image_${user_id}.stamp: docker/Dockerfile.local
+	docker image build \
+		--build-arg userid=${user_id} \
+		--build-arg groupid=${user_group} \
+		--build-arg username=${user_name} \
+		-f docker/Dockerfile.local \
+		-t ${yocto-builder-TAG} docker
+	touch $@
+
+
+.PHONY: yocto-builder
+yocto-builder: builder-docker-image_${user_id}.stamp
+
+# login into docker container		
+.PHONY: builder-login
+builder-login: builder-image
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash
+
+# login into docker container		
+.PHONY: builder-qcom-wayland
+builder-qcom-wayland: builder-image
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image"
+
+
+# build QEMU
+.PHONY: builder-qemu
+builder-qemu:
+	cd tools/qemu && \
+	if [ -e build ]; then \
+		mv build build-$(shell date +%s).bak && \
+		echo "Backup created."; \
+	else \
+		echo "No 'build' directory to back up."; \
+	fi && \
+	mkdir build && \
+	cd build && \
+	../configure \
+		--enable-gtk \
+		--enable-slirp \
+		--enable-virtfs \
+		--enable-vhost-net \
+		--enable-vhost-user \
+		--target-list=aarch64-softmmu && \
+	make -j
+
+# 
+.PHONY: run-qemu
+run-qemu:
+	${AARCH64_QEMU} \
+     -machine virt,gic-version=3,virtualization=on \
+     -cpu max \
+     -smp 8 \
+     -m 8G \
+     -kernel ${KERNEL_IMG} \
+     -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0 earlycon" \
+     -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
+     -device virtio-blk-pci,drive=hd0,bootindex=0 \
+     -netdev user,id=net0 \
+     -device virtio-net-pci,netdev=net0 \
+     -monitor telnet:127.0.0.1:5555,server,nowait \
+     -device virtio-gpu-pci \
+     -device virtio-mouse \
+     -device virtio-keyboard \
+     -serial mon:stdio
+

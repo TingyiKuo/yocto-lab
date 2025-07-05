@@ -29,6 +29,9 @@ S = "${WORKDIR}/kernel"
 
 KERNEL_CONFIG ??= "qcom_defconfig"
 
+# Enable QEMU support
+KERNEL_CONFIG_FRAGMENTS:append = " ${S}/kernel/configs/kvm_guest.config"
+
 KERNEL_CONFIG_FRAGMENTS:append = " ${S}/arch/arm64/configs/qcom_addons.config"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/qcom_debug.config', '', d)}"
 KERNEL_CONFIG_FRAGMENTS:append = " ${@oe.utils.vartrue('DEBUG_BUILD', '${S}/arch/arm64/configs/qcom_addons_debug.config', '', d)}"

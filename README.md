@@ -30,7 +30,7 @@ repo sync -j$(nproc)
 
 
 
-Step2: prepare yocto-builder
+Step2: prepare yocto-builder image
 
 ```bash
 docker image build --build-arg userid=$(id -u) \
@@ -50,7 +50,7 @@ docker run -it --rm \
     -v "/home/yocto/cache:/home/yocto/cache" \
     -v ${PWD}:${PWD} \
     -w ${PWD} \
-    yocto-builder \
+    amito4/yocto-builder \
     bash
 
 # or
@@ -61,23 +61,19 @@ docker run -it --rm \
 ```
 
 
-# in docker
+Step4: setup and build inside docker
 
-Build by bitbake
 
 ```bash
 
-# For (U)
+# This will create folder "build-qcom-wayland" and conf/* files if not exist.
+
 MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
-MACHINE=qemuarm64 DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qemu-wayland
-#bitbake core-image-minimal
+#MACHINE=qemuarm64 DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qemu-wayland <-- To porting.
+
+# choose image recipe
+
 bitbake qcom-multimedia-image
-
-# For (R)
-MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
-MACHINE=qemuarm64 DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
-../qirp-build qcom-robotics-full-image
-
 ```
 
 | Image recipe | Description |
@@ -90,22 +86,6 @@ MACHINE=qemuarm64 DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom sourc
 
 ## Output
 /home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx
-
-
-Thomas's command
-
-```base
-export EXTRALAYERS="meta-qcom-extras meta-qcom-robotics-extras" && \
-export CUST_ID="213195" && \
-export FWZIP_PATH="/ssd1/workarea/IQ9100/IQ9100_firmware_extras/qualcomm-linux-spf-1-0_hlos_oem_metadata/QCS9100.LE.1.0/common/build/ufs/bin" && \
-MACHINE=qcs9100-ride-sx && export DISTRO=qcom-robotics-ros2-jazzy && QCOM_SELECTED_BSP=custom && source setup-robotics-environment && \
-../qirp-build qcom-robotics-full-image
-```
-
-## Self hosted runner 
-
-Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
-
 
 ## To sync code from to my kernel git.
 
@@ -145,6 +125,59 @@ git reset --hard e21546bdd3154f9ee83a579f2e3c80d313c1169d # This is from the cod
 git push origin my-kernel.qclinux.1.0.r1-rel
 
 
+```
+
+
+## To run QEMU
+```base
+# runqemu qemux86-64 qcom-multimedia-image ext4 <-- Not work
+
+RPIIMG=/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/qcom-multimedia-image-qcs9100-ride-sx.rootfs.ext4
+/home/tingyikuo/ssd1/pegasus/qemu_kvm/qemu-src/qemu/build/qemu-system-aarch64 -machine virt -cpu cortex-a55 -smp 8 -m 8G \
+    -kernel /home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image \
+    -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0" \
+    -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
+    -device virtio-blk,drive=hd0,bootindex=0 \
+    -monitor telnet:127.0.0.1:5555,server,nowait \
+    -device virtio-gpu \
+    -device virtio-mouse \
+    -device virtio-keyboard \
+    -serial mon:stdio
+``
+
+If you don't modify any password related config, the default password should be
 
 ```
+user:root
+password:oelinux123
+```
+
+
+# Note
+
+
+Below are notes for reference.
+
+Thomas's command
+
+
+```baseh
+# For 
+MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
+../qirp-build qcom-robotics-full-image
+
+```
+
+```base
+export EXTRALAYERS="meta-qcom-extras meta-qcom-robotics-extras" && \
+export CUST_ID="213195" && \
+export FWZIP_PATH="/ssd1/workarea/IQ9100/IQ9100_firmware_extras/qualcomm-linux-spf-1-0_hlos_oem_metadata/QCS9100.LE.1.0/common/build/ufs/bin" && \
+MACHINE=qcs9100-ride-sx && export DISTRO=qcom-robotics-ros2-jazzy && QCOM_SELECTED_BSP=custom && source setup-robotics-environment && \
+../qirp-build qcom-robotics-full-image
+```
+
+## Self hosted runner 
+
+Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
+
 
