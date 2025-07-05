@@ -69,7 +69,7 @@ Build by bitbake
 
 # For (U)
 MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
-
+MACHINE=qemuarm64 DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qemu-wayland
 #bitbake core-image-minimal
 bitbake qcom-multimedia-image
 
@@ -79,6 +79,18 @@ MACHINE=qemuarm64 DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom sourc
 ../qirp-build qcom-robotics-full-image
 
 ```
+
+| Image recipe | Description |
+|----------|:---------:|
+| qcom-minimal-image            | A minimal rootfs image that boots to shell | 
+| qcom-console-image            | Boot to shell with package group to bring in all the basic packages | 
+| qcom-multimedia-image         |  Image recipe includes recipes for multimedia software components, such as, audio, Bluetooth®, camera, computer vision, display, and video. | 
+| qcom-multimedia-test-image    |  Image recipe that includes tests | 
+
+
+## Output
+/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx
+
 
 Thomas's command
 
