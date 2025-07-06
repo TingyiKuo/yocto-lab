@@ -17,7 +17,7 @@ show_help:
 	@echo "make builder-image : build docker image"
 	@echo "make builder-login : login into interactive container"
 	@echo "make builder-qcom-wayland : build build-qcom-wayland"
-	@echo "make builder-qemu :
+	@echo "make builder-qemu :"
 	
 	
 	
@@ -60,6 +60,17 @@ builder-qcom-wayland: builder-image
 		-w ${PWD} \
 		${yocto-builder-TAG} \
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image"
+
+# login into docker container		
+.PHONY: clean-builder-qcom-wayland
+clean-builder-qcom-wayland: builder-image
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake -c cleanall qcom-multimedia-image && bitbake qcom-multimedia-image"
+
 
 
 # build QEMU
