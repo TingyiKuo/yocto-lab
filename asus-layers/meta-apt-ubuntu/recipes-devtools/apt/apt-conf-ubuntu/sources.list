@@ -1,0 +1,12 @@
+# Ubuntu APT repositories for ARM64
+deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ jammy main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ jammy-updates main restricted universe multiverse
+deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse
+
+# Ubuntu APT repositories for ARM64
+# Using Ubuntu 20.04 (Focal) for better compatibility with older dpkg
+# deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal main restricted universe multiverse
+# deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal-updates main restricted universe multiverse
+# deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted universe multiverse
+# Will have glibc issue:
+#   Yocto-built system has glibc 2.35+ (newer), but the Ubuntu 20.04 trying to install have glibc 2.31.
