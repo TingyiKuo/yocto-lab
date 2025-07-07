@@ -23,12 +23,8 @@ show_help:
 	
 all:show_help
 
-
-.PHONY: builder-image
-builder-image: builder-docker-image_${user_id}.stamp
-
 # build yocto-builder docker image
-builder-docker-image_${user_id}.stamp: docker/Dockerfile.local
+build-docker-image_${user_id}.stamp: docker/Dockerfile.local
 	docker image build \
 		--build-arg userid=${user_id} \
 		--build-arg groupid=${user_group} \
@@ -42,8 +38,8 @@ builder-docker-image_${user_id}.stamp: docker/Dockerfile.local
 yocto-builder: builder-docker-image_${user_id}.stamp
 
 # login into docker container		
-.PHONY: builder-login
-builder-login: builder-image
+.PHONY: login-builder
+login-builder: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -52,8 +48,8 @@ builder-login: builder-image
 		bash
 
 # login into docker container		
-.PHONY: builder-qcom-wayland
-builder-qcom-wayland: builder-image
+.PHONY: build-qcom-wayland
+build-qcom-wayland: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -61,9 +57,9 @@ builder-qcom-wayland: builder-image
 		${yocto-builder-TAG} \
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image"
 
-# login into docker container		
-.PHONY: clean-builder-qcom-wayland
-clean-builder-qcom-wayland: builder-image
+# login into docker container
+.PHONY: clean-build-qcom-wayland
+clean-build-qcom-wayland: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -72,10 +68,30 @@ clean-builder-qcom-wayland: builder-image
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake -c cleanall qcom-multimedia-image && bitbake qcom-multimedia-image"
 
 
+# login into docker container
+.PHONY: fetch-qcom-wayland
+fetch-qcom-wayland: yocto-builder
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake -c cleanall qcom-multimedia-image && bitbake qcom-multimedia-image --runall fetch"
+
+# login into docker container
+.PHONY: build-qcom-wayland-no-download
+build-qcom-wayland-no-download: yocto-builder
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && BB_NO_NETWORK=1 bitbake qcom-multimedia-image"
+
 
 # build QEMU
-.PHONY: builder-qemu
-builder-qemu:
+.PHONY: build-qemu
+build-qemu:
 	cd tools/qemu && \
 	if [ -e build ]; then \
 		mv build build-$(shell date +%s).bak && \

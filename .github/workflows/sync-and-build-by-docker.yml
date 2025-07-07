@@ -19,14 +19,7 @@ on:
         options:
           - self-hosted
           - build-new
-      use_cache:
-        description: "Use caching for sstate-cache"
-        required: true
-        default: "no"
-        type: choice
-        options:
-          - yes
-          - no
+
 jobs:
   build:
     #runs-on: ubuntu-latest
@@ -56,7 +49,7 @@ jobs:
 
       - name: Repo init
         run: |
-            repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.65-QLI.1.4-Ver.1.1.xml
+            repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
 
       # Restore repo cache before syncing
       - name: Restore repo cache
@@ -92,7 +85,7 @@ jobs:
                               --build-arg userid=$(id -u) \
                               --build-arg groupid=$(id -g) \
                               --build-arg username=$(id -un) \
-                              -t yocto-builder \
+                              -t amito4/yocto-builder \
                               -f docker/Dockerfile docker/
 
       # Save Docker cache
@@ -103,34 +96,20 @@ jobs:
           path: /tmp/.buildx-cache
           key: docker-cache-${{ hashFiles('docker/Dockerfile', 'docker/**/*') }}
 
-      # Restore Yocto sstate-cache
-      - name: Restore sstate-cache
-        if: ${{ inputs.use_cache == 'yes' }}
-        uses: actions/cache@v3
-        with:
-          path: sstate-cache
-          key: sstate-cache-${{ github.sha }}
 
       - name: Run Yocto build inside Docker container
         run: |
           docker run --rm \
-            -v "/home/yocto-mirror/downloads:/home/yocto-mirror/downloads" \
+            -v "/home/yocto/cache:/home/yocto/cache" \
             -v "${GITHUB_WORKSPACE}:/app" \
             -w /app \
-            yocto-builder \
+            amito4/yocto-builder \
             bash -c " \
               echo 'In docker bash.' && pwd && ls -l && \
               MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=base source setup-environment build-qcom-wayland && \
               bitbake core-image-minimal \
             "
 
-      # Save Yocto sstate-cache
-      - name: Save sstate-cache
-        if: ${{ inputs.use_cache == 'yes' }}
-        uses: actions/cache@v3
-        with:
-          path: sstate-cache
-          key: sstate-cache-${{ github.sha }}
 
       - name: Upload build artifacts
         if: always()
