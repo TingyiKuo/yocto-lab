@@ -181,3 +181,19 @@ MACHINE=qcs9100-ride-sx && export DISTRO=qcom-robotics-ros2-jazzy && QCOM_SELECT
 Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
 
 
+## Note
+
+cd layers
+
+git clone https://github.com/OSSystems/meta-browser.git
+
+[branch "scarthgap"]
+        merge = refs/heads/scarthgap
+
+git clone https://github.com/kraj/meta-clang.git
+
+        merge = refs/heads/scarthgap
+
+git clone https://git.yoctoproject.org/meta-lts-mixins
+
+        merge = refs/heads/scarthgap/rust

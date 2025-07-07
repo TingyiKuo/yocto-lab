@@ -14,10 +14,10 @@ AARCH64_QEMU=./tools/qemu/build/qemu-system-aarch64
 show_help:
 	@echo "make : show help"
 	@echo "make run-qemu : launch qemu"
-	@echo "make builder-image : build docker image"
-	@echo "make builder-login : login into interactive container"
-	@echo "make builder-qcom-wayland : build build-qcom-wayland"
-	@echo "make builder-qemu :"
+	@echo "make build-image : build docker image"
+	@echo "make login-builder : login into interactive container"
+	@echo "make build-qcom-wayland : build build-qcom-wayland"
+	@echo "make build-qemu :"
 	
 	
 	
