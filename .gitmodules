@@ -1,3 +1,9 @@
 [submodule "tools/qemu"]
 	path = tools/qemu
 	url = https://github.com/qemu/qemu.git
+[submodule "asus-layers/meta-browser"]
+	path = asus-layers/meta-browser
+	url = https://github.com/OSSystems/meta-browser.git
+[submodule "asus-layers/meta-clang"]
+	path = asus-layers/meta-clang
+	url = https://github.com/kraj/meta-clang.git
