@@ -26,8 +26,10 @@ jobs:
     runs-on: [self-hosted, linux, x64]
 
     steps:
-      - name: Checkout Custom Layer
+      - name: Checkout Custom Layer and Submodules
         uses: actions/checkout@v4
+        with:
+          submodules: true # <--- Add this line for submodules
 
       - name: Show selected variables
         run: |
