@@ -186,14 +186,19 @@ Need to put the downloads folder at /home/yocoto/downloads and make sure have pe
 cd layers
 
 git clone https://github.com/OSSystems/meta-browser.git
-
-[branch "scarthgap"]
-        merge = refs/heads/scarthgap
-
-git clone https://github.com/kraj/meta-clang.git
-
-        merge = refs/heads/scarthgap
+cd meta-browser/
+git checkout scarthgap
+git checkout 1ed2254d72a4c25879014c98be287a7e3e22904c
 
 git clone https://git.yoctoproject.org/meta-lts-mixins
+cd meta-lts-mixins
+git checkout scarthgap/rust
+git checkout 1793a1b8fc92cf8688c72b7fd4181e3a2f5ade55
 
-        merge = refs/heads/scarthgap/rust
+git clone https://github.com/kraj/meta-clang.git
+cd meta-clang/
+git checkout scarthgap
+git checkout 8c77b427408db01b8de4c04bd3d247c13c154f92
+
+
+

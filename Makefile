@@ -24,7 +24,7 @@ show_help:
 all:show_help
 
 # build yocto-builder docker image
-build-docker-image_${user_id}.stamp: docker/Dockerfile.local
+builder-docker-image_${user_id}.stamp: docker/Dockerfile.local
 	docker image build \
 		--build-arg userid=${user_id} \
 		--build-arg groupid=${user_group} \
@@ -47,6 +47,10 @@ login-builder: yocto-builder
 		${yocto-builder-TAG} \
 		bash
 
+
+
+
+
 # login into docker container		
 .PHONY: build-qcom-wayland
 build-qcom-wayland: yocto-builder
@@ -56,6 +60,9 @@ build-qcom-wayland: yocto-builder
 		-w ${PWD} \
 		${yocto-builder-TAG} \
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image"
+
+.PHONY: build
+build: build-qcom-wayland
 
 # login into docker container
 .PHONY: clean-build-qcom-wayland
@@ -67,6 +74,8 @@ clean-build-qcom-wayland: yocto-builder
 		${yocto-builder-TAG} \
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake -c cleanall qcom-multimedia-image && bitbake qcom-multimedia-image"
 
+.PHONY: clean-build
+clean-build: clean-build-qcom-wayland
 
 # login into docker container
 .PHONY: fetch-qcom-wayland

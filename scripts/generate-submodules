@@ -1,0 +1,29 @@
+#!/bin/bash
+cd ./asus-layers
+
+# Add meta-browser as a submodule
+git submodule add https://github.com/OSSystems/meta-browser.git meta-browser
+cd meta-browser
+git checkout scarthgap
+git checkout 1ed2254d72a4c25879014c98be287a7e3e22904c
+cd ..
+
+# Add meta-lts-mixins as a submodule
+git submodule add https://git.yoctoproject.org/meta-lts-mixins meta-lts-mixins
+cd meta-lts-mixins
+git checkout scarthgap/rust
+git checkout 1793a1b8fc92cf8688c72b7fd4181e3a2f5ade55
+cd ..
+
+# Add meta-clang as a submodule
+git submodule add https://github.com/kraj/meta-clang.git meta-clang
+cd meta-clang
+git checkout scarthgap
+git checkout 8c77b427408db01b8de4c04bd3d247c13c154f92
+cd ..
+
+# Stage the changes to your main repository
+git add .gitmodules asus-layers/meta-browser asus-layers/meta-lts-mixins asus-layers/meta-clang
+
+# Commit the submodules
+git commit -m "Add meta-browser, meta-lts-mixins, and meta-clang as submodules"
