@@ -48,6 +48,11 @@ login-builder: yocto-builder
 		bash
 
 
+.PHONY: repo-init
+#repo-init:setup-environment
+repo-init:
+	repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
+	repo sync
 
 
 
