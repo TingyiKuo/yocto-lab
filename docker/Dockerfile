@@ -38,8 +38,11 @@ ENV USER=$username
 ENV TZ=Asia/Taipei
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# change root password
+RUN echo  'xxx\nxxx' | passwd root 
+
 ###############################################################################
-RUN apt-get update 
+RUN apt-get update --fix-missing
 
 ###############################################################################
 # Build tools for yocto IQ9100

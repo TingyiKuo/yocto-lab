@@ -29,7 +29,8 @@ jobs:
       - name: Checkout Custom Layer and Submodules
         uses: actions/checkout@v4
         with:
-          submodules: true # <--- Add this line for submodules
+          # Add this line for submodules
+          submodules: true
 
       - name: Show selected variables
         run: |
