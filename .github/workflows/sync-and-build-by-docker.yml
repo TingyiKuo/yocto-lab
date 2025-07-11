@@ -26,11 +26,16 @@ jobs:
     runs-on: [self-hosted, linux, x64]
 
     steps:
-      - name: Checkout Custom Layer and Submodules
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Add this line for submodules
-          submodules: true
+          fetch-depth: 0
+
+      - name: Initialize submodules manually
+        run: |
+          git submodule init
+          git submodule update --recursive --depth=1
+
 
       - name: Show selected variables
         run: |
