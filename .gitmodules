@@ -1,6 +1,9 @@
+# For QEMU
 [submodule "tools/qemu"]
 	path = tools/qemu
 	url = https://github.com/qemu/qemu.git
+
+# To enable Chrome on IQ9
 [submodule "asus-layers/meta-browser"]
 	path = asus-layers/meta-browser
 	url = https://github.com/OSSystems/meta-browser.git
@@ -11,3 +14,7 @@
 	path = asus-layers/meta-lts-mixins
 	url = https://git.yoctoproject.org/meta-lts-mixins.git
 
+# For Raspberry Pi
+[submodule "asus-layers/meta-raspberrypi"]
+	path = asus-layers/meta-raspberrypi
+	url = https://git.yoctoproject.org/git/meta-raspberrypi
