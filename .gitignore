@@ -28,10 +28,11 @@ build-qcs9100-base/tmp-glibc/
 build-qcs9100-base/tmp-qcom-guestvm-glibc/
 
 
-# For  build-qemu-wayland
-build-qemu-wayland/bitbake-cookerdaemon.log
-build-qemu-wayland/bitbake.lock
-build-qemu-wayland/bitbake.sock
-build-qemu-wayland/cache/
-build-qemu-wayland/tmp-glibc/
-build-qemu-wayland/tmp-qcom-guestvm-glibc/
+# For  build-qemu-weston
+build-qemuarm64/bitbake-cookerdaemon.log
+build-qemuarm64/bitbake.lock
+build-qemuarm64/bitbake.sock
+build-qemuarm64/hashserve.sock
+build-qemuarm64/cache/
+build-qemuarm64/tmp/
+

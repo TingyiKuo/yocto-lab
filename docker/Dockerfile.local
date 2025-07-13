@@ -14,6 +14,7 @@ FROM ubuntu:22.04
 ARG userid
 ARG groupid
 ARG username
+ARG password=xxx
 
 ###############################################################################
 # Environment establish
@@ -21,6 +22,9 @@ ARG username
 RUN groupadd -g $groupid $username \
  && useradd -m -u $userid -g $groupid $username \
  && echo $username >/root/username 
+
+RUN echo "${username}:${password}" | chpasswd
+
 # && echo "export USER="$username >>/home/$username/.gitconfig
 
 # You can copy your gitconfig file by unmark these lines.
@@ -39,7 +43,7 @@ ENV TZ=Asia/Taipei
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # change root password
-RUN echo  'xxx\nxxx' | passwd root 
+# RUN echo  'xxx\nxxx' | passwd root 
 
 ###############################################################################
 RUN apt-get update --fix-missing
@@ -50,7 +54,7 @@ RUN apt-get update --fix-missing
 #   https://docs.qualcomm.com/bundle/publicresource/topics/80-70018-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.4
 
 
-RUN apt-get install -y repo gawk wget git diffstat unzip texinfo gcc build-essential 
+RUN apt-get install -y repo gawk wget git diffstat unzip texinfo gcc build-essential perl 
 RUN apt-get install -y chrpath socat cpio python3 python3-pip python3-pexpect xz-utils 
 RUN apt-get install -y debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa
 RUN apt-get install -y libsdl1.2-dev pylint xterm python3-subunit mesa-common-dev zstd 
@@ -104,6 +108,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 gcc-multilib \
                 g++-multilib
 
+
+                
+# Use system Perl instead of custom installation
+# Custom Perl installation removed to avoid version conflicts
+
 ###############################################################################
 # Useful tools
 
@@ -113,18 +122,14 @@ RUN apt-get install -y ranger
 RUN apt-get install -y git-core
 
 # mutiplexer
-RUN apt-get install -y byobu
-
-
+# RUN apt-get install -y byobu
 
 RUN cp -af /etc/skel/ /etc/vncskel/ && \
     echo "export DISPLAY=1" >>/etc/vncskel/.bashrc && \
-    mkdir  /etc/vncskel/.vnc && \
+    mkdir /etc/vncskel/.vnc && \
     echo "" | vncpasswd -f > /etc/vncskel/.vnc/passwd && \
     chmod 0600 /etc/vncskel/.vnc/passwd && \
-    /usr/sbin/locale-gen en_US.UTF-8 && \
-    echo 'dash dash/sh boolean false' | debconf-set-selections && \
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
+    /usr/sbin/locale-gen en_US.UTF-8
 
 COPY build-install-dumb-init.sh /
 RUN  bash /build-install-dumb-init.sh && \
@@ -147,3 +152,4 @@ RUN echo "toilet -w 200 -f mono9 Hi~ Yocto"  >> /home/$username/.bashrc
 
 # Do not use Bitbake as root
 USER $username
+

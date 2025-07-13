@@ -1,3 +1,53 @@
+
+
+
+# Yocto lab
+
+## Build 0 : sync QCT's repo (make repo-init)
+
+Environment
+
+```baseh
+export WS=${PWD}
+export OEROOT="$WS/layers/poky"
+echo WS=$WS
+echo OEROOT=$OEROOT
+```
+
+https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.5#github-workflow-unregistered-users
+
+
+```bash
+repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
+
+repo sync -j$(nproc)
+```
+
+The yocto is at layers/poky
+
+```xml
+<remote fetch="https://git.yoctoproject.org" name="yocto" review="git.yoctoproject.org"/>
+..
+ <project name="poky" path="layers/poky" remote="yocto" revision="0ce88bc3474d29122e6f319cf474e5c5dce55419" upstream="refs/heads/scarthgap"/>
+```
+
+
+
+## 1. Build 1: aarch64 QEMU 
+
+create build folder
+
+```bash
+. ${OEROOT}/oe-init-build-env build-qemuarm64
+```
+
+Modify conf files.
+
+
+
+
+2.
+
 # myiq9qemu
 Build and run IQ9 image on QEMU
 
@@ -9,15 +59,7 @@ The board support package (BSP) image build has software components for the Qual
 ## To Build with GitHub for unregistered users (U) / Registered users (R)
 
 
-https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.5#github-workflow-unregistered-users
 
-Step1: sync QCT's repo
-
-```bash
-repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
-
-repo sync -j$(nproc)
-```
 
 
 | SKU | manifest file | distribution |
