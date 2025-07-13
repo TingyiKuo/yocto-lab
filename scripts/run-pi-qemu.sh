@@ -31,11 +31,12 @@ ${AARCH64_QEMU} \
 	-m 1024 \
 	-kernel ${PI3_WESTON_KERNEL_IMG} \
 	-dtb ${PI3_WESTON_KERNEL_DTB} \
-	-drive format=raw,file=${PI3_WESTON_ROOTFS_EXT3} \
+	-drive format=raw,file=${RPIIMG} \
 	-append "root=/dev/sda rw console=tty1" \
 	-netdev user,id=net0 \
 	-device usb-net,netdev=net0 \
-	-serial stdio \
+    -monitor telnet:127.0.0.1:5555,server,nowait \
+    -serial mon:stdio \
 	-display gtk,gl=on \
 	-device usb-kbd \
 	-device usb-mouse
