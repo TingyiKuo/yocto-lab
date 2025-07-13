@@ -1,2 +1,3 @@
-MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
-
+#!/bin/sh
+echo MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
+echo source ${OEROOT}/oe-init-build-env build-rpi3

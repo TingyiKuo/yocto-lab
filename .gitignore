@@ -27,6 +27,13 @@ build-qcs9100-base/cache/
 build-qcs9100-base/tmp-glibc/
 build-qcs9100-base/tmp-qcom-guestvm-glibc/
 
+# For Raspberry Pi3
+build-rpi3/bitbake-cookerdaemon.log
+build-rpi3/bitbake.lock
+build-rpi3/bitbake.sock
+build-rpi3/cache/
+build-rpi3/tmp/
+
 
 # For  build-qemu-weston
 build-qemuarm64/bitbake-cookerdaemon.log

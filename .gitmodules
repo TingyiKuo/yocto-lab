@@ -18,3 +18,4 @@
 [submodule "asus-layers/meta-raspberrypi"]
 	path = asus-layers/meta-raspberrypi
 	url = https://git.yoctoproject.org/git/meta-raspberrypi
+	branch = scarthgap

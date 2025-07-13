@@ -36,6 +36,19 @@ yocto-builder: docker/Dockerfile.local
 build-image: yocto-builder
 
 
+# login without any build environment
+.PHONY: login-builder
+login-builder: yocto-builder
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		-e WS=${PWD} \
+		-e OEROOT="${PWD}/layers/poky" \
+		${yocto-builder-TAG} \
+		bash -c 'echo WS=$$WS; echo OEROOT=$$OEROOT; exec bash'
+
+
 #####################################################################
 # Code sync
 
@@ -90,6 +103,74 @@ fetch-qcom-wayland: yocto-builder
 		${yocto-builder-TAG} \
 		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image --runall fetch"
 
+
+#####################################################################
+# Image: Raspberry Pi 3 (build-rpi3)
+
+PI3_WESTON_ROOTFS_EXT3=${WS}/build-rpi3/tmp/deploy/images/raspberrypi3/core-image-weston-raspberrypi3.rootfs.ext3
+PI3_WESTON_KERNEL_IMG=${WS}/build-rpi3/tmp/deploy/images/raspberrypi3/Image
+PI3_WESTON_KERNEL_DTB=${WS}/build-rpi3/tmp/deploy/images/raspberrypi3/bcm2837-rpi-3-b.dtb
+
+# login Pi3 builder
+.PHONY: login-pi3-builder
+login-pi3-builder: yocto-builder
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		-e WS=${PWD} \
+		-e OEROOT="${PWD}/layers/poky" \
+		${yocto-builder-TAG} \
+		bash -c 'echo WS=$$WS; echo OEROOT=$$OEROOT; source ${OEROOT}/oe-init-build-env build-rpi3 ; exec bash'
+
+# build Pi3
+.PHONY: build-pi3
+build-pi3: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi3 && bitbake core-image-weston"
+
+# clean build Pi3
+.PHONY: clean-build-pi3
+clean-build-pi3: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi3 && bitbake -c cleanall core-image-weston && bitbake core-image-weston"
+
+# fetch Pi3
+.PHONY: fetch-pi3
+fetch-pi3: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi3 && bitbake core-image-weston --runall fetch"
+
+
+# run QEMU
+.PHONY: run-pi3
+run-pi3:
+	${AARCH64_QEMU} \
+	-M raspi3b \
+	-cpu cortex-a53 \
+	-m 1024 \
+	-kernel ${PI3_WESTON_KERNEL_IMG} \
+	-dtb ${PI3_WESTON_KERNEL_DTB} \
+	-drive format=raw,file=${PI3_WESTON_ROOTFS_EXT3} \
+	-append "root=/dev/sda rw console=tty1" \
+	-netdev user,id=net0 \
+	-device usb-net,netdev=net0 \
+	-serial stdio \
+	-display gtk,gl=on \
+	-device usb-kbd \
+	-device usb-mouse
 
 #####################################################################
 # Image: QEMU Westron (build-qemuarm64)
