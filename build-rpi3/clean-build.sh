@@ -1,1 +1,1 @@
-rm -rf downloads sstate-cache cache tmp bitbake-cookerdaemon.log
+rm -rf bitbake-cookerdaemon.log cache tmp
