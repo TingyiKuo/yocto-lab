@@ -153,7 +153,7 @@ fetch-pi3: yocto-builder
 # run QEMU Pi3
 .PHONY: run-pi3
 run-pi3:
-	WS=${WS} . scripts/run-pi-qemu.sh
+	WS=${WS} . tools/run-pi-qemu.sh
 
 #####################################################################
 # Image: QEMU Westron (build-qemuarm64)
