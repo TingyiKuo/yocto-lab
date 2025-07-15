@@ -295,15 +295,23 @@ build-emulator:
 	mkdir build && \
 	cd build && \
 	../configure \
+		--enable-fdt \
+		--enable-pixman \
 		--enable-gtk \
+		--enable-sdl \
+		--enable-opengl \
+		--enable-virglrenderer \
 		--enable-slirp \
 		--enable-virtfs \
 		--enable-vhost-net \
 		--enable-vhost-user \
-		--target-list=aarch64-softmmu && \
+		--target-list=aarch64-softmmu,arm-softmmu && \
 	make -j
 
-# 
+# The --enable-virglrenderer need
+# sudo apt install libvirglrenderer-dev
+
+ 
 .PHONY: run-qemu
 run-qemu:
 	${AARCH64_QEMU} \
