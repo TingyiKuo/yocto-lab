@@ -17,6 +17,7 @@ AARCH64_QEMU=./tools/qemu/build/qemu-system-aarch64
 .PHONY: show_help
 show_help:
 	grep .PHONY Makefile
+	# source ./tools/set-ws-env.sh No work..
 
 all:show_help
 
@@ -105,6 +106,57 @@ fetch-qcom-wayland: yocto-builder
 
 
 #####################################################################
+# Image: Raspberry Pi 4 (build-rpi4)
+
+# login Pi3 builder
+.PHONY: login-pi4-builder
+login-pi4-builder: yocto-builder
+	docker run -it --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		-e WS=${PWD} \
+		-e OEROOT="${PWD}/layers/poky" \
+		${yocto-builder-TAG} \
+		bash -c 'echo WS=$$WS; echo OEROOT=$$OEROOT; source ${OEROOT}/oe-init-build-env build-rpi4 ; exec bash'
+
+# build Pi4
+.PHONY: build-pi4
+build-pi4: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi4 && bitbake core-image-weston"
+
+# clean build Pi4
+.PHONY: clean-build-pi4
+clean-build-pi4: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi4 && bitbake -c cleanall core-image-weston && bitbake core-image-weston"
+
+# fetch Pi4
+.PHONY: fetch-pi4
+fetch-pi4: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "source ${OEROOT}/oe-init-build-env build-rpi4 && bitbake core-image-weston --runall fetch"
+
+
+# run QEMU Pi4
+.PHONY: run-pi4
+run-pi4:
+	WS=${WS} . tools/run-rpi4-qemu.sh
+
+#####################################################################
 # Image: Raspberry Pi 3 (build-rpi3)
 
 # login Pi3 builder
@@ -153,7 +205,7 @@ fetch-pi3: yocto-builder
 # run QEMU Pi3
 .PHONY: run-pi3
 run-pi3:
-	WS=${WS} . tools/run-pi-qemu.sh
+	WS=${WS} . tools/run-rpi3-qemu.sh
 
 #####################################################################
 # Image: QEMU Westron (build-qemuarm64)
