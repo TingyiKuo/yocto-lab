@@ -1,10 +1,12 @@
 SUMMARY = "Example application with static library linking"
 DESCRIPTION = "Recipe for testing static linking with custom library"
 LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=16257211ae52567965e4ca7137f94939"
 
 SRC_URI += "file://hello.cpp \
             file://mathlib.cpp \
-            file://mathlib.h"
+            file://mathlib.h \
+            file://LICENSE"
 
 S = "${WORKDIR}"
 
@@ -14,7 +16,7 @@ do_compile() {
     ${AR} rcs libmath.a mathlib.o
     
     # Compile the application and link with the static library
-    ${CXX} ${CXXFLAGS} hello.cpp -L. -lmath -static -o hello-static
+    ${CXX} ${CXXFLAGS} ${LDFLAGS} hello.cpp -L. -lmath -static -o hello-static
 }
 
 do_install() {
