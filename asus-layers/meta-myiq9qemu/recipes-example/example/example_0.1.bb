@@ -2,12 +2,15 @@ SUMMARY = "bitbake-layers recipe"
 DESCRIPTION = "Recipe created by bitbake-layers"
 LICENSE = "MIT"
 
-SRC_URI += "file://hello.cpp"
+SRC_URI += "file://hello.cpp \
+            file://mathlib.cpp \
+            file://mathlib.h"
 
 S = "${WORKDIR}"
 
 do_compile() {
-    ${CXX} hello.cpp -o hello-world
+    # Compile library and application together (simple approach)
+    ${CXX} hello.cpp mathlib.cpp -o hello-world
 }
 
 do_install() {

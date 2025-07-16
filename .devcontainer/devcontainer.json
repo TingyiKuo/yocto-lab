@@ -1,0 +1,41 @@
+{
+	"name": "Yocto Builder Environment",
+	"image": "amito4/yocto-builder",
+
+	"workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+	"workspaceFolder": "${localWorkspaceFolder}",
+
+	"mounts": [
+		"source=/home/yocto/cache,target=/home/yocto/cache,type=bind"
+		"source=/home/tingyikuo/ssd1,target=/home/tingyikuo/ssd1,type=bind"
+	],
+
+	// Use `remoteEnv` to set environment variables. This is the equivalent of the `-e` flags.
+	"remoteEnv": {
+		"WS": "${localWorkspaceFolder}",
+		"OEROOT": "${localWorkspaceFolder}/layers/poky"
+	},
+
+	"overrideCommand": true,
+	"command": [
+		"bash", "-c",
+		"echo WS=$WS; echo OEROOT=$OEROOT; exec bash"
+	],
+
+	// Customize the VS Code environment inside the container
+	"customizations": {
+		"vscode": {
+			// Set the default shell for the integrated terminal
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash"
+			},
+			// List of VS Code extension IDs to automatically install in the container
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-python.python",
+				"ms-vscode.cmake-tools",
+				"yocto-project.yocto-bitbake"
+			]
+		}
+	}
+}
