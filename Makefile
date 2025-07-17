@@ -37,9 +37,9 @@ yocto-builder: docker/Dockerfile.local
 build-image: yocto-builder
 
 
-# login without any build environment
-.PHONY: login-builder
-login-builder: yocto-builder
+# interactive run without any build environment
+.PHONY: itrun-builder
+itrun-builder: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -62,9 +62,9 @@ repo-init:
 #####################################################################
 # Image: QCOM Wayland (build-qcom-wayland)
 
-# login QCOM Wayland builder
-.PHONY: login-qcom-wayland-builder
-login-qcom-wayland-builder: yocto-builder
+# interactive run QCOM Wayland builder
+.PHONY: itrun-qcom-wayland-builder
+itrun-qcom-wayland-builder: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -108,9 +108,9 @@ fetch-qcom-wayland: yocto-builder
 #####################################################################
 # Image: Raspberry Pi 4 (build-rpi4)
 
-# login Pi3 builder
-.PHONY: login-pi4-builder
-login-pi4-builder: yocto-builder
+# interactive run Pi3 builder
+.PHONY: itrun-pi4-builder
+itrun-pi4-builder: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -159,9 +159,9 @@ run-pi4:
 #####################################################################
 # Image: Raspberry Pi 3 (build-rpi3)
 
-# login Pi3 builder
-.PHONY: login-pi3-builder
-login-pi3-builder: yocto-builder
+# interactive run Pi3 builder
+.PHONY: itrun-pi3-builder
+itrun-pi3-builder: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \
@@ -214,9 +214,9 @@ QEMU_WESTON_ROOTFS_EXT4=${WS}/build-qemuarm64/tmp/deploy/images/qemuarm64/core-i
 QEMU_WESTON_KERNEL_IMG=${WS}/build-qemuarm64/tmp/deploy/images/qemuarm64/Image
 
 
-# login QEMU builder
-.PHONY: login-qemu-builder-weston
-login-qemu-builder-weston: yocto-builder
+# interactive run QEMU builder
+.PHONY: itrun-qemu-builder-weston
+itrun-qemu-builder-weston: yocto-builder
 	docker run -it --rm \
 		-v /home/yocto/cache:/home/yocto/cache \
 		-v ${PWD}:${PWD} \

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export WS="$(pwd)"
 echo "WS set to $WS"
