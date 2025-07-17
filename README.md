@@ -1,27 +1,30 @@
-
-
-
 # Yocto lab
 
-## Build 0 : sync QCT's repo (make repo-init)
+## Prepare Envionment : sync QCT's repo (make repo-init)
 
-Environment
+After sync this repo, do 
 
-```baseh
+```bash
+make repo-init
+```
+
+first. The make will help to do repo init and sync as below:
+
+```bash
+repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
+repo sync -j$(nproc)
+
 export WS=${PWD}
 export OEROOT="$WS/layers/poky"
 echo WS=$WS
 echo OEROOT=$OEROOT
 ```
 
+REF:
+
 https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.5#github-workflow-unregistered-users
 
 
-```bash
-repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
-
-repo sync -j$(nproc)
-```
 
 The yocto is at layers/poky
 
