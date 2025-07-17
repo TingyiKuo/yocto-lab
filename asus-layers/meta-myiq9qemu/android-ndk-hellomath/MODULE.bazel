@@ -1,0 +1,4 @@
+module(name = "hellomath_ndk", version = "1.0")
+
+# Note: Using WORKSPACE for Android NDK configuration
+# since MODULE.bazel extensions are not working properly

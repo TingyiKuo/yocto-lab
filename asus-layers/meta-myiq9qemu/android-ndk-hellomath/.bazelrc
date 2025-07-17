@@ -1,0 +1,11 @@
+# Enable WORKSPACE for Bazel 8
+common --enable_workspace
+
+# Android NDK build configuration using legacy approach
+build:android_arm64 --android_crosstool_top=@androidndk//:toolchain
+build:android_arm64 --crosstool_top=@androidndk//:toolchain
+build:android_arm64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build:android_arm64 --cpu=arm64-v8a
+build:android_arm64 --compiler=clang
+build:android_arm64 --action_env=ANDROID_NDK_HOME
+build:android_arm64 --action_env=ANDROID_HOME
