@@ -1,6 +1,16 @@
 # Yocto lab
 
-## Prepare Envionment : sync QCT's repo (make repo-init)
+## To sync this repo
+
+```bash
+git clone --recursive https:/github.com/TingyiKuo/yocto-lab.git
+cd yocto-lab
+```
+
+## Quick Guide for qcom-console-image
+
+
+* Step 1: sync QCT's repo (make repo-init)
 
 After sync this repo, do 
 
@@ -8,7 +18,114 @@ After sync this repo, do
 make repo-init
 ```
 
-first. The make will help to do repo init and sync as below:
+* Step 2: Build yocto builder (Docker image)
+
+```bash
+make build-yocto-builder
+```
+
+* step 3: Build QCOM's image
+
+Note: The download and sstate files will be located at /home/yocto/cache
+make sure you have this folder with permissions
+
+See the build-qcom-wayland/conf/site.conf
+
+```bash
+make build-qcom-wayland
+```
+
+* step 4: Build QEMU emulator
+
+```bash
+make build-emulator
+```
+
+* step 5: Run QEMU
+
+```bash
+make run-qcom-wayland
+```
+
+If you don't modify any password related config, the default password should be
+
+```bash
+user:root
+password:oelinux123
+```
+
+* Step 6: Kill QEMU
+
+You may use another terminal to kill qemu.
+
+```bash
+make kill-qemu
+```
+
+* Note: Debug with Yocto env
+
+You man interactive run into yocto-builder by
+
+```bash
+make itrun-qcom-wayland-builder
+```
+
+and run 'env' to have QCOM's weston build environment.
+
+
+```bash
+. env.sh
+```
+
+choose the image you want to build
+
+| Image recipe | Description |
+|----------|:---------:|
+| qcom-minimal-image            | A minimal rootfs image that boots to shell | 
+| qcom-console-image            | Boot to shell with package group to bring in all the basic packages | 
+| qcom-multimedia-image         |  Image recipe includes recipes for multimedia software components, such as, audio, Bluetooth®, camera, computer vision, display, and video. | 
+| qcom-multimedia-test-image    |  Image recipe that includes tests | 
+
+
+## Quick Guide for qemu-aarch64, Raspiberry Pi3/4
+
+* Build QEMU emulator if not yet
+
+```bash
+make build-emulator
+```
+
+* sync code
+
+```bash
+make repo-init
+```
+
+* Build qemu-arm64 Rpi3 or Rpi4
+
+```bash
+# For qemu-arm64
+make build-qemu-weston
+make run-qemu-weston
+
+# For Pi4
+make build-pi4
+make run-pi4
+
+# For Pi3
+make build-pi3
+make run-pi3
+```
+
+or you can flash image to a SD card.
+
+```bash
+make flash-pi4
+```
+
+## About QCOM's repo layout
+
+The "make repo-init" will help to do repo init and sync as below:
 
 ```bash
 repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
@@ -20,7 +137,7 @@ echo WS=$WS
 echo OEROOT=$OEROOT
 ```
 
-REF:
+This is the build SOP from QCT's official reference:
 
 https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/github_workflow_unregistered_users.html?vproduct=1601111740013072&version=1.5#github-workflow-unregistered-users
 
@@ -34,103 +151,14 @@ The yocto is at layers/poky
  <project name="poky" path="layers/poky" remote="yocto" revision="0ce88bc3474d29122e6f319cf474e5c5dce55419" upstream="refs/heads/scarthgap"/>
 ```
 
+The Distro supported by QCOM are 'qcom-wayland' and 'qcom-robotics-ros2-humble', need to repo init different manifest. This repo currently init qcom-wayland only.
 
-
-## 1. Build 1: aarch64 QEMU 
-
-create build folder
-
-```bash
-. ${OEROOT}/oe-init-build-env build-qemuarm64
-```
-
-Modify conf files.
-
-
-
-
-2.
-
-# myiq9qemu
-Build and run IQ9 image on QEMU
-
-# Build a BSP image
-
-The board support package (BSP) image build has software components for the Qualcomm device support and software features applicable to Qualcomm SoCs. This build includes a reference distribution configuration for the Qualcomm development kits. For more details, see Qualcomm Linux metadata layers.
-
-
-## To Build with GitHub for unregistered users (U) / Registered users (R)
-
-
-
-
-
-| SKU | manifest file | distribution |
-|----------|:---------:|---------:|
-| BSP build: High-level OS and prebuilt firmware (GPS only)  |  qcom-6.6.90-QLI.1.5-Ver.1.1.xml  |  qcom-wayland  |
-| BSP build + Qualcomm IM SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_qim-product-sdk-2.0.1.xml   |  qcom-wayland  |
-| BSP build + Real-time kernel build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_realtime-linux-1.1.xml   |    qcom-wayland  |
-| BSP build + QIR SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml   |   qcom-robotics-ros2-humble  |
-
-
-
-
-Step2: prepare yocto-builder image
-
-```bash
-docker image build --build-arg userid=$(id -u) \
-             --build-arg groupid=$(id -g) \
-             --build-arg username=$(id -un) \
-             -t yocto-builder \
-             -f docker/Dockerfile.local docker
-
-
-```                              
-
-Step3: login into docker containner
-
-```baseh
-
-docker run -it --rm \
-    -v "/home/yocto/cache:/home/yocto/cache" \
-    -v ${PWD}:${PWD} \
-    -w ${PWD} \
-    amito4/yocto-builder \
-    bash
-
-# or
-
-. docker/login-into-docker
-
-
-```
-
-
-Step4: setup and build inside docker
-
-
-```bash
-
-# This will create folder "build-qcom-wayland" and conf/* files if not exist.
-
-MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland
-#MACHINE=qemuarm64 DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qemu-wayland <-- To porting.
-
-# choose image recipe
-
-bitbake qcom-multimedia-image
-```
-
-| Image recipe | Description |
-|----------|:---------:|
-| qcom-minimal-image            | A minimal rootfs image that boots to shell | 
-| qcom-console-image            | Boot to shell with package group to bring in all the basic packages | 
-| qcom-multimedia-image         |  Image recipe includes recipes for multimedia software components, such as, audio, Bluetooth®, camera, computer vision, display, and video. | 
-| qcom-multimedia-test-image    |  Image recipe that includes tests | 
-
-
-## Output
-/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx
+-| SKU | manifest file | distribution |
+-|----------|:---------:|---------:|
+-| BSP build: High-level OS and prebuilt firmware (GPS only)  |  qcom-6.6.90-QLI.1.5-Ver.1.1.xml  |  qcom-wayland  |
+-| BSP build + Qualcomm IM SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_qim-product-sdk-2.0.1.xml   |  qcom-wayland  |
+-| BSP build + Real-time kernel build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_realtime-linux-1.1.xml   |    qcom-wayland  |
+-| BSP build + QIR SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml   |   qcom-robotics-ros2-humble  |
 
 ## To sync code from to my kernel git.
 
@@ -171,79 +199,4 @@ git push origin my-kernel.qclinux.1.0.r1-rel
 
 
 ```
-
-
-## To run QEMU
-```base
-# runqemu qemux86-64 qcom-multimedia-image ext4 <-- Not work
-
-RPIIMG=/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/qcom-multimedia-image-qcs9100-ride-sx.rootfs.ext4
-/home/tingyikuo/ssd1/pegasus/qemu_kvm/qemu-src/qemu/build/qemu-system-aarch64 -machine virt -cpu cortex-a55 -smp 8 -m 8G \
-    -kernel /home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image \
-    -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0" \
-    -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
-    -device virtio-blk,drive=hd0,bootindex=0 \
-    -monitor telnet:127.0.0.1:5555,server,nowait \
-    -device virtio-gpu \
-    -device virtio-mouse \
-    -device virtio-keyboard \
-    -serial mon:stdio
-``
-
-If you don't modify any password related config, the default password should be
-
-```
-user:root
-password:oelinux123
-```
-
-
-# Note
-
-
-Below are notes for reference.
-
-Thomas's command
-
-
-```baseh
-# For 
-MACHINE=qcs9100-ride-sx DISTRO=qcom-robotics-ros2-jazzy QCOM_SELECTED_BSP=custom source setup-environment build-qcs9100-base
-../qirp-build qcom-robotics-full-image
-
-```
-
-```base
-export EXTRALAYERS="meta-qcom-extras meta-qcom-robotics-extras" && \
-export CUST_ID="213195" && \
-export FWZIP_PATH="/ssd1/workarea/IQ9100/IQ9100_firmware_extras/qualcomm-linux-spf-1-0_hlos_oem_metadata/QCS9100.LE.1.0/common/build/ufs/bin" && \
-MACHINE=qcs9100-ride-sx && export DISTRO=qcom-robotics-ros2-jazzy && QCOM_SELECTED_BSP=custom && source setup-robotics-environment && \
-../qirp-build qcom-robotics-full-image
-```
-
-## Self hosted runner 
-
-Need to put the downloads folder at /home/yocoto/downloads and make sure have permissions
-
-
-## Note
-
-cd layers
-
-git clone https://github.com/OSSystems/meta-browser.git
-cd meta-browser/
-git checkout scarthgap
-git checkout 1ed2254d72a4c25879014c98be287a7e3e22904c
-
-git clone https://git.yoctoproject.org/meta-lts-mixins
-cd meta-lts-mixins
-git checkout scarthgap/rust
-git checkout 1793a1b8fc92cf8688c72b7fd4181e3a2f5ade55
-
-git clone https://github.com/kraj/meta-clang.git
-cd meta-clang/
-git checkout scarthgap
-git checkout 8c77b427408db01b8de4c04bd3d247c13c154f92
-
-
 
