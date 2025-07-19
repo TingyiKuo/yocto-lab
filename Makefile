@@ -6,8 +6,6 @@ user_group=$(shell id -g)
 WS=$(shell pwd)
 OEROOT=${WS}/layers/poky
 
-RPIIMG=${WS}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/qcom-multimedia-image-qcs9100-ride-sx.rootfs.ext4
-KERNEL_IMG=${WS}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image
 AARCH64_QEMU=./tools/qemu/build/qemu-system-aarch64
 
 
@@ -33,8 +31,8 @@ yocto-builder: docker/Dockerfile.local
 		-f docker/Dockerfile.local \
 		-t ${yocto-builder-TAG} docker
 
-.PHONY: build-image
-build-image: yocto-builder
+.PHONY: build-yocto-builder
+build-yocto-builder: yocto-builder
 
 
 # interactive run without any build environment
@@ -62,6 +60,24 @@ repo-init:
 #####################################################################
 # Image: QCOM Wayland (build-qcom-wayland)
 
+# There are 4 image supported now.
+#
+# qcom-minimal-image            | A minimal rootfs image that boots to shell 
+# qcom-console-image            | Boot to shell with package group to bring in all the basic packages
+# qcom-multimedia-image         |  Image recipe includes recipes for multimedia software components, such as, audio, Bluetooth®, camera, computer vision, display, and video.
+# qcom-multimedia-test-image    |  Image recipe that includes tests
+QCOM_IMAGE=qcom-console-image
+
+
+# Different QCOM distro need different repo.
+
+# BSP build: High-level OS and prebuilt firmware (GPS only)  |  qcom-6.6.90-QLI.1.5-Ver.1.1.xml  |  qcom-wayland
+# BSP build + Qualcomm IM SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_qim-product-sdk-2.0.1.xml   |  qcom-wayland
+# BSP build + Real-time kernel build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_realtime-linux-1.1.xml   |    qcom-wayland
+# BSP build + QIR SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml   |   qcom-robotics-ros2-humble
+
+QCOM_DISTRO=qcom-wayland
+
 # interactive run QCOM Wayland builder
 .PHONY: itrun-qcom-wayland-builder
 itrun-qcom-wayland-builder: yocto-builder
@@ -82,7 +98,7 @@ build-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake ${QCOM_IMAGE}"
 
 # clean build QCOM Wayland
 .PHONY: clean-build-qcom-wayland
@@ -92,7 +108,7 @@ clean-build-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake -c cleanall qcom-multimedia-image && bitbake qcom-multimedia-image"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake -c cleanall ${QCOM_IMAGE} && bitbake ${QCOM_IMAGE}"
 
 # fetch QCOM Wayland
 .PHONY: fetch-qcom-wayland
@@ -102,7 +118,12 @@ fetch-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=qcom-wayland QCOM_SELECTED_BSP=custom source setup-environment build-qcom-wayland && bitbake qcom-multimedia-image --runall fetch"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake ${QCOM_IMAGE} --runall fetch"
+
+# run QCOM Wayland
+.PHONY: run-qcom-wayland
+run-qcom-wayland:
+	WS=${WS} . tools/run-myiq9-qemu.sh ${QCOM_DISTRO} ${QCOM_IMAGE}
 
 
 #####################################################################
@@ -155,6 +176,12 @@ fetch-pi4: yocto-builder
 .PHONY: run-pi4
 run-pi4:
 	WS=${WS} . tools/run-rpi4-qemu.sh
+
+# flash Pi4 image to SD card
+.PHONY: flash-pi4
+flash-pi4:
+	WS=${WS} . tools/flash-rpi4.sh
+
 
 #####################################################################
 # Image: Raspberry Pi 3 (build-rpi3)
@@ -259,6 +286,7 @@ fetch-qemu-weston: yocto-builder
 # run QEMU
 .PHONY: run-qemu-weston
 run-qemu-weston:
+	# WS=${WS} . tools/run-myiq9-qemu.sh
 	${AARCH64_QEMU} \
      -machine virt,gic-version=3,virtualization=on \
      -cpu max \

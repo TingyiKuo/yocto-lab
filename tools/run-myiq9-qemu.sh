@@ -1,50 +1,38 @@
+#/bin/bash
 
-sudo -v
+
 export WORK_TARGET=~/killme/justkill
-export SYSTEM_MNT=${WORK_TARGET}/system
-mkdir -p ${SYSTEM_MNT}
 
+export KERNEL_IMG=${WS}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image
 
-# ~/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx
-/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx
+export AARCH64_QEMU_SYS=./tools/qemu/build/qemu-system-aarch64
+export AARCH64_QEMU_IMG=./tools/qemu/build/qemu-img
 
-export RPI_WIC_IMG=$(find ~/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx -name "qcom-multimedia-image-qcs9100-ride-sx.rootfs-*.ext4")
+export RPI_EXT4_IMG=$(find ${WS}/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx -name "qcom-console-image-qcs9100-ride-sx.rootfs-*.ext4")
 
- "core-image-weston-qcs9100-ride-sx.rootfs-*.ext4")
+# Create WORK_TARGET directory if it doesn't exist
+mkdir -p "${WORK_TARGET}"
+export RPIIMG=${WORK_TARGET}/system.img.ext4
 
+echo
 
-echo RPI_WIC_IMG=${RPI_WIC_IMG}
-cp ${RPI_WIC_IMG} ${WORK_TARGET}/system.img
-sudo -v
+echo "Checking if ${RPIIMG} is older than ${RPI_EXT4_IMG}..."
+if [ ! -f "${RPIIMG}" ] || \
+   [ "${RPI_EXT4_IMG}" -nt "${RPIIMG}" ]; then
+    cp "${RPI_EXT4_IMG}" "${RPIIMG}"
+	# extend system image
+	${AARCH64_QEMU_IMG} resize ${RPIIMG} 32G
+else
+    echo "${RPIIMG} is up to date, no copy needed."
+fi
 
-# extend system image
-truncate -s 32G ${WORK_TARGET}/system.img
-
-LOOPID=$(sudo losetup -f) && echo ${LOOPID}
-sudo losetup ${LOOPID} ${WORK_TARGET}/system.img
-
-sudo e2fsck -f ${LOOPID}
-# might need to goto /home/tingyikuo/ssd1/pegasus/e2fsprogs
-# and build latest e2fsck
-
-sudo resize2fs -f -p ${LOOPID}
-sudo losetup -d ${LOOPID}
-
-sudo mount -v ${WORK_TARGET}/system.img ${SYSTEM_MNT}
-
-
-# Kernel 
-cd /home/tingyikuo/ssd1/pegasus/qemu_kvm/emu-rasbpi/kernel-src/linux-6.6.51/
-
-sudo ARCH=arm64 CROSS_COMPILE=/bin/aarch64-linux-gnu- make modules_install INSTALL_MOD_PATH=${SYSTEM_MNT}
-
-sudo umount ${SYSTEM_MNT}
-export RPIIMG=${WORK_TARGET}/system.img
-
+echo
 
 # No GUI
-echo Skip~ qemu-system-aarch64 -machine virt -cpu cortex-a72 -smp 8 -m 8G \
-    -kernel /home/tingyikuo/ssd1/pegasus/qemu_kvm/emu-rasbpi/kernel-src/linux-6.6.51/arch/arm64/boot/Image \
+${AARCH64_QEMU_SYS} \
+    -machine virt,virtualization=on \
+    -cpu max  -smp 8 -m 12G \
+    -kernel ${KERNEL_IMG} \
     -append "root=/dev/vda rootfstype=ext4 rw panic=0 systemd.log_level=debug systemd.log_target=console console=ttyAMA0" \
     -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
     -device virtio-blk,drive=hd0,bootindex=0 \
@@ -54,10 +42,12 @@ echo Skip~ qemu-system-aarch64 -machine virt -cpu cortex-a72 -smp 8 -m 8G \
     -nographic \
     -serial mon:stdio
 echo
-	
-# GUI
-/home/tingyikuo/ssd1/pegasus/qemu_kvm/qemu-src/qemu/build/qemu-system-aarch64 -machine virt -cpu cortex-a55 -smp 8 -m 8G \
-    -kernel /home/tingyikuo/ssd1/pegasus/qemu_kvm/emu-rasbpi/kernel-src/linux-6.6.51/arch/arm64/boot/Image \
+
+: <<'END_COMMENT'
+# GUI. not succeed yet..
+echo Skip~ ${AARCH64_QEMU_SYS} \
+    -machine virt -cpu cortex-a57 -smp 8 -m 8G \
+    -kernel ${KERNEL_IMG} \
     -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0" \
     -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
     -device virtio-blk,drive=hd0,bootindex=0 \
@@ -67,19 +57,5 @@ echo
     -device virtio-keyboard \
     -serial mon:stdio
 echo
-# kill $(pidof qemu-system-aarch64)	
-
-
-RPIIMG=/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/qcom-multimedia-image-qcs9100-ride-sx.rootfs.ext4
-KERNEL_IMG=/home/tingyikuo/ssd1/repos/github.com/TingyiKuo/myiq9qemu/build-qcom-wayland/tmp-glibc/deploy/images/qcs9100-ride-sx/Image
-AARCH64_QEMU=/home/tingyikuo/ssd1/pegasus/qemu_kvm/qemu-src/qemu/build/qemu-system-aarch64
-${AARCH64_QEMU} \
-     -machine virt,gic-version=3,virtualization=on \
-     -cpu max \
-     -smp 8 \
-     -m 8G \
-     -kernel ${KERNEL_IMG} \
-     -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0 earlycon" \
-     -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback     -device virtio-blk-pci,drive=hd0,bootindex=0     -netdev user,id=net0     -device virtio-net-pci,netdev=net0     -monitor telnet:127.0.0.1:5555,server,nowait     -device virtio-gpu-pci     -device virtio-mouse     -device virtio-keyboard     -serial mon:stdio
-
+END_COMMENT
 
