@@ -3,7 +3,7 @@
 ## To sync this repo
 
 ```bash
-git clone --recursive https:/github.com/TingyiKuo/yocto-lab.git
+git clone --recursive https://github.com/TingyiKuo/yocto-lab.git
 cd yocto-lab
 ```
 
