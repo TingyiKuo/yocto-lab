@@ -51,11 +51,27 @@ itrun-builder: yocto-builder
 #####################################################################
 # Code sync
 
+.PHONY: check-submodules
+check-submodules:
+	@echo "Checking git submodules..."
+	@git config --file .gitmodules --get-regexp path | awk '{print $$2}' | while read -r path; do \
+		if [ ! -f "$$path/.git" ]; then \
+			echo "Submodule '$$path' not initialized. Please run 'git submodule update --init --recursive'"; \
+			exit 1; \
+		fi; \
+		done
+	@echo "All git submodules are initialized."
+
 .PHONY: repo-init
 #repo-init:setup-environment
-repo-init:
+repo-init: check-submodules
 	repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
 	repo sync
+
+
+
+
+
 
 #####################################################################
 # Image: QCOM Wayland (build-qcom-wayland)
