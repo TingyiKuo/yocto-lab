@@ -309,18 +309,18 @@ run-qemu-weston:
      -smp 8 \
      -m 8G \
      -kernel ${QEMU_WESTON_KERNEL_IMG} \
-     -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0 earlycon" \
+	 -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0 earlycon" \
      -drive format=raw,file=${QEMU_WESTON_ROOTFS_EXT4},if=none,id=hd0,cache=writeback \
      -device virtio-blk-pci,drive=hd0,bootindex=0 \
      -netdev user,id=net0 \
-     -device virtio-net-pci,netdev=net0 \
      -monitor telnet:127.0.0.1:5555,server,nowait \
      -serial mon:stdio \
     -device qemu-xhci,id=usb \
     -device usb-tablet,bus=usb.0 \
-    -device virtio-keyboard-pci \
+	-device usb-kbd,bus=usb.0 \
     -device virtio-gpu-pci \
-     -display gtk,gl=on,grab-on-hover=on
+     -display gtk,gl=on,grab-on-hover=on \
+	-device virtio-net-pci,netdev=net0,rombar=0
 
 
 #####################################################################
@@ -367,7 +367,7 @@ run-qemu:
      -append "root=/dev/vda rootfstype=ext4 rw panic=0 console=ttyAMA0 earlycon" \
      -drive format=raw,file=${RPIIMG},if=none,id=hd0,cache=writeback \
      -device virtio-blk-pci,drive=hd0,bootindex=0 \
-     -netdev user,id=net0 \
+	 -netdev user,id=mynet,hostfwd=tcp::2222-:22 \
      -device virtio-net-pci,netdev=net0 \
      -monitor telnet:127.0.0.1:5555,server,nowait \
      -serial mon:stdio \
@@ -375,7 +375,8 @@ run-qemu:
     -device usb-tablet,bus=usb.0 \
     -device virtio-keyboard-pci \
     -device virtio-gpu-pci \
-     -display gtk,gl=on,grab-on-hover=on
+     -display gtk,gl=on,grab-on-hover=on \
+
 	
 .PHONY: kill-qemu
 kill-qemu:
