@@ -1,1 +1,1 @@
-rm -rf build-qemuarm64/tmp build-qemuarm64/cache build-qemuarm64/sstate-cache
+rm -rf bitbake-cookerdaemon.log cache tmp

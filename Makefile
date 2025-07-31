@@ -63,18 +63,16 @@ check-submodules:
 	@echo "All git submodules are initialized."
 
 .PHONY: repo-init
-#repo-init:setup-environment
 repo-init: check-submodules
 	repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1.xml
 	repo sync
 
+.PHONY: repo-init-ros2
+repo-init-ros2: check-submodules
+	repo init -u https://github.com/qualcomm-linux/qcom-manifest -b qcom-linux-scarthgap -m qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml
+	repo sync
 
 
-
-
-
-#####################################################################
-# Image: QCOM Wayland (build-qcom-wayland)
 
 # There are 4 image supported now.
 #
@@ -92,7 +90,6 @@ QCOM_IMAGE=qcom-console-image
 # BSP build + Real-time kernel build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_realtime-linux-1.1.xml   |    qcom-wayland
 # BSP build + QIR SDK build:  |  qcom-6.6.90-QLI.1.5-Ver.1.1_robotics-product-sdk-1.1.xml   |   qcom-robotics-ros2-humble
 
-QCOM_DISTRO=qcom-wayland
 
 # interactive run QCOM Wayland builder
 .PHONY: itrun-qcom-wayland-builder
@@ -106,6 +103,11 @@ itrun-qcom-wayland-builder: yocto-builder
 		${yocto-builder-TAG} \
 		bash -c 'echo WS=$$WS; echo OEROOT=$$OEROOT; exec bash'
 
+#####################################################################
+# Image: QCOM Wayland (build-qcom-wayland)
+QCOM_WAYLAND_DISTRO=qcom-wayland
+
+
 # build QCOM Wayland
 .PHONY: build-qcom-wayland
 build-qcom-wayland: yocto-builder
@@ -114,7 +116,7 @@ build-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake ${QCOM_IMAGE}"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_WAYLAND_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOQCOM_WAYLAND_DISTROM_DISTRO} && bitbake ${QCOM_IMAGE}"
 
 # clean build QCOM Wayland
 .PHONY: clean-build-qcom-wayland
@@ -124,7 +126,7 @@ clean-build-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake -c cleanall ${QCOM_IMAGE} && bitbake ${QCOM_IMAGE}"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_WAYLAND_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_WAYLAND_DISTRO} && bitbake -c cleanall ${QCOM_IMAGE} && bitbake ${QCOM_IMAGE}"
 
 # fetch QCOM Wayland
 .PHONY: fetch-qcom-wayland
@@ -134,13 +136,54 @@ fetch-qcom-wayland: yocto-builder
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
 		${yocto-builder-TAG} \
-		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_DISTRO} && bitbake ${QCOM_IMAGE} --runall fetch"
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_WAYLAND_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_WAYLAND_DISTRO} && bitbake ${QCOM_IMAGE} --runall fetch"
 
 # run QCOM Wayland
 .PHONY: run-qcom-wayland
 run-qcom-wayland:
-	WS=${WS} . tools/run-myiq9-qemu.sh ${QCOM_DISTRO} ${QCOM_IMAGE}
+	WS=${WS} . tools/run-myiq9-qemu.sh ${QCOM_WAYLAND_DISTRO} ${QCOM_IMAGE}
 
+#####################################################################
+# Image: QCOM Robotics ROS2 (build-qcom-robotics-ros2-jazzy)
+QCOM_ROBOT_DISTRO=qcom-robotics-ros2-jazzy
+
+### ERROR: Please Change your /bin/sh symlink to point to bash. ###
+### sudo ln -sf /bin/bash /bin/sh ###
+
+# build QCOM Robot
+.PHONY: build-qcom-robot
+build-qcom-robot: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_ROBOT_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_ROBOT_DISTRO} && bitbake ${QCOM_IMAGE}"
+
+# clean build QCOM Robot
+.PHONY: clean-build-qcom-robot
+clean-build-qcom-robot: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_ROBOT_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_ROBOT_DISTRO} && bitbake -c cleanall ${QCOM_IMAGE} && bitbake ${QCOM_IMAGE}"
+
+# fetch QCOM Robot
+.PHONY: fetch-qcom-robot
+fetch-qcom-robot: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c "MACHINE=qcs9100-ride-sx DISTRO=${QCOM_ROBOT_DISTRO} QCOM_SELECTED_BSP=custom source setup-environment build-${QCOM_ROBOT_DISTRO} && bitbake ${QCOM_IMAGE} --runall fetch"
+
+# run QCOM Robot
+.PHONY: run-qcom-robot
+run-qcom-robot:
+	WS=${WS} . tools/run-myiq9-qemu.sh ${QCOM_ROBOT_DISTRO} ${QCOM_IMAGE}
 
 #####################################################################
 # Image: Raspberry Pi 4 (build-rpi4)
@@ -278,6 +321,16 @@ build-qemu-weston: yocto-builder
 		-w ${PWD} \
 		${yocto-builder-TAG} \
 		bash -c '. ${OEROOT}/oe-init-build-env build-qemuarm64 && bitbake  core-image-weston '
+
+# build QEMU SDK
+.PHONY: build-qemu-weston-sdk
+build-qemu-weston-sdk: yocto-builder
+	docker run --rm \
+		-v /home/yocto/cache:/home/yocto/cache \
+		-v ${PWD}:${PWD} \
+		-w ${PWD} \
+		${yocto-builder-TAG} \
+		bash -c '. ${OEROOT}/oe-init-build-env build-qemuarm64 && bitbake  core-image-weston -c populate_sdk_ext'
 
 # clean build QEMU
 .PHONY: clean-build-qemu-weston

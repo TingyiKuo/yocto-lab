@@ -137,6 +137,15 @@ RUN  bash /build-install-dumb-init.sh && \
      apt-get clean
  
 
+# Additional Python packages are required to support the BitBake build process.
+RUN pip3 install \
+    GitPython \
+    jinja2 \
+    pyyaml \
+    dateparser \
+    psutil \
+    requests
+
 
 ###############################################################################
 # Local setting.
@@ -149,6 +158,10 @@ RUN update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 RUN echo "export LC_ALL=en_US.UTF-8" >> /home/$username/.bashrc
 RUN echo "export LANG=en_US.UTF-8" >> /home/$username/.bashrc
 RUN echo "toilet -w 200 -f mono9 Hi~ Yocto"  >> /home/$username/.bashrc
+
+### ERROR: Please Change your /bin/sh symlink to point to bash. ###
+RUN ln -sf /bin/bash /bin/sh ###
+ENV SHELL=/bin/bash
 
 # Do not use Bitbake as root
 USER $username

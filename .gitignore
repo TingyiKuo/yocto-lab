@@ -51,3 +51,10 @@ build-qemuarm64/hashserve.sock
 build-qemuarm64/cache/
 build-qemuarm64/tmp/
 
+
+# For QCOM robot
+build-qcom-robotics-ros2-jazzy/bitbake-cookerdaemon.log
+build-qcom-robotics-ros2-jazzy/buildhistory/
+build-qcom-robotics-ros2-jazzy/cache/
+build-qcom-robotics-ros2-jazzy/tmp-glibc/
+build-qcom-robotics-ros2-jazzy/tmp-qcom-guestvm-glibc/
