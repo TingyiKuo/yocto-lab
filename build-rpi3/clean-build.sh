@@ -1,1 +1,1 @@
-rm -rf bitbake-cookerdaemon.log cache tmp
+rm -rf bitbake* cache tmp hashserve.sock 
